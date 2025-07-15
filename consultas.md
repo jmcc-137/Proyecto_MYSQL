@@ -1,303 +1,1376 @@
 
-# CONSULTAS
+# 🔹 **1. Consultas SQL Especializadas**
 
+## 1. Como analista, quiero listar todos los productos con su empresa asociada y el precio más bajo por ciudad.
 
-## COUNTRIES
-
+### RESPUSTA
 ```sql
-INSERT INTO countries (isocode, name, alfaisotwo, alfaisothree) VALUES
-('004', 'Afganistán', 'AF', 'AFG'),
-('008', 'Albania', 'AL', 'ALB'),
-('276', 'Alemania', 'DE', 'DEU'),
-('020', 'Andorra', 'AD', 'AND'),
-('024', 'Angola', 'AO', 'AGO'),
-('660', 'Anguila', 'AI', 'AIA'),
-('010', 'Antártida', 'AQ', 'ATA'),
-('028', 'Antigua y Barbuda', 'AG', 'ATG'),
-('032', 'Argentina', 'AR', 'ARG'),
-('682', 'Arabia Saudi', 'SA', 'SAU'),
-('051', 'Armenia', 'AM', 'ARM'),
-('533', 'Aruba', 'AW', 'ABW'),
-('036', 'Australia', 'AU', 'AUS'),
-('040', 'Austria', 'AT', 'AUT'),
-('031', 'Azerbaiyán', 'AZ', 'AZE'),
-('044', 'Bahamas', 'BS', 'BHS'),
-('050', 'Bangladés', 'BD', 'BGD'),
-('052', 'Barbados', 'BB', 'BRB'),
-('048', 'Baréin', 'BH', 'BHR'),
-('056', 'Belgica', 'BE', 'BEL'),
-('084', 'Belice', 'BZ', 'BLZ'),
-('204', 'Benin', 'BJ', 'BEN'),
-('060', 'Bermudas', 'BM', 'BMU'),
-('112', 'Bielorussia', 'BY', 'BLR'),
-('104', 'Birmania', 'MM', 'MMR'),
-('068', 'Bolivia', 'BO', 'BOL'),
-('070', 'Bosnia y Herzegovina', 'BA', 'BIH'),
-('072', 'Botsuana', 'BW', 'BWA'),
-('076', 'Brasil', 'BR', 'BRA'),
-('096', 'Brunéi', 'BN', 'BRN'),
-('100', 'Bulgaria', 'BG', 'BGR'),
-('854', 'Burkina Faso', 'BF', 'BFA'),
-('108', 'Burundi', 'BI', 'BDI'),
-('064', 'Bután', 'BT', 'BTN'),
-('132', 'Cabo Verde', 'CV', 'CPV'),
-('116', 'Camboya', 'KH', 'KHM'),
-('120', 'Camerún', 'CM', 'CMR'),
-('124', 'Canadá', 'CA', 'CAN'),
-('535', 'Caribe Neerlandés', 'BQ', 'BES'),
-('634', 'Catar', 'QA', 'QAT'),
-('148', 'Chad', 'TD', 'TCD'),
-('152', 'Chile', 'CL', 'CHL'),
-('156', 'China', 'CN', 'CHN'),
-('196', 'Chipre', 'CY', 'CYP'),
-('170', 'Colombia', 'CO', 'COL'),
-('174', 'Comoras', 'KM', 'COM'),
-('408', 'Corea del Norte', 'KP', 'PRK'),
-('410', 'Corea del Sur', 'KR', 'KOR'),
-('384', 'Costa de Marfil', 'CI', 'CIV'),
-('188', 'Costa Rica', 'CR', 'CRI'),
-('191', 'Croacia', 'HR', 'HRV'),
-('192', 'Cuba', 'CU', 'CUB'),
-('531', 'Curazao', 'CW', 'CUW'),
-('208', 'Dinamarca', 'DK', 'DNK'),
-('212', 'Dominica', 'DM', 'DMA'),
-('218', 'Ecuador', 'EC', 'ECU'),
-('818', 'Egipto', 'EG', 'EGY'),
-('222', 'El Salvador', 'SV', 'SLV'),
-('784', 'Emiratos árabes Unidos', 'AE', 'ARE'),
-('232', 'Eritrea', 'ER', 'ERI'),
-('703', 'Eslovaquia', 'SK', 'SVK'),
-('705', 'Eslovenia', 'SI', 'SVN'),
-('724', 'España', 'ES', 'ESP'),
-('583', 'Estados Federados de Micronesia', 'FM', 'FSM'),
-('840', 'Estados Unidos', 'US', 'USA'),
-('233', 'Estonia', 'EE', 'EST'),
-('231', 'Etiopía', 'ET', 'ETH'),
-('608', 'Filipinas', 'PH', 'PHL'),
-('246', 'Finlandia', 'FI', 'FIN'),
-('242', 'Fiyi', 'FJ', 'FJI'),
-('250', 'Francia', 'FR', 'FRA'),
-('266', 'Gabon', 'GA', 'GAB'),
-('270', 'Gambia', 'GM', 'GMB'),
-('268', 'Georgia', 'GE', 'GEO'),
-('288', 'Ghana', 'GH', 'GHA'),
-('292', 'Gibraltar', 'GI', 'GIB'),
-('308', 'Granada', 'GD', 'GRD'),
-('300', 'Grecia', 'GR', 'GRC'),
-('304', 'Groenlandia', 'GL', 'GRL'),
-('312', 'Guadelupe', 'GP', 'GLP'),
-('316', 'Guam', 'GU', 'GUM'),
-('320', 'Guatemala', 'GT', 'GTM'),
-('254', 'Guayana Francesa', 'GF', 'GUF'),
-('831', 'Guernsey', 'GG', 'GGY'),
-('324', 'Guinea', 'GN', 'GIN'),
-('226', 'Guinea Ecuatorial', 'GQ', 'GNQ'),
-('624', 'Guinea-Bissau', 'GW', 'GNB'),
-('328', 'Guyana', 'GY', 'GUY'),
-('332', 'Haití', 'HT', 'HTI'),
-('340', 'Honduras', 'HN', 'HND'),
-('344', 'Hong Kong', 'HK', 'HKG'),
-('348', 'Hungría', 'HU', 'HUN'),
-('352', 'Iceland', 'IS', 'ISL'),
-('356', 'India', 'IN', 'IND'),
-('360', 'Indonesia', 'ID', 'IDN'),
-('368', 'Irak', 'IQ', 'IRQ'),
-('364', 'Iran', 'IR', 'IRN'),
-('833', 'Isla de Man', 'IM', 'IMN'),
-('162', 'Isla de Navidad', 'CX', 'CXR'),
-('574', 'Isla Norfolk', 'NF', 'NFK'),
-('372', 'Islandia', 'IE', 'IRL'),
-('136', 'Islas Caimán', 'KY', 'CYM'),
-('166', 'Islas Cocos', 'CC', 'CCK'),
-('184', 'Islas Cook', 'CK', 'COK'),
-('234', 'Islas Feroe', 'FO', 'FRO'),
-('239', 'Islas Georgias y Sandwich del Sur', 'GS', 'SGS'),
-('238', 'Islas Malvinas', 'FK', 'FLK'),
-('580', 'Islas Marianas del Norte', 'MP', 'MNP'),
-('584', 'Islas Marshall', 'MH', 'MHL'),
-('612', 'Islas Pitcairn', 'PN', 'PCN'),
-('090', 'Islas Salomón', 'SB', 'SLB'),
-('796', 'Islas Turcas y Caicos', 'TC', 'TCA'),
-('092', 'Islas Vírgenes Británicas', 'VG', 'VGB'),
-('850', 'Islas Vírgenes de los Estados Unidos', 'VI', 'VIR'),
-('376', 'Israel', 'IL', 'ISR'),
-('380', 'Italia', 'IT', 'ITA'),
-('388', 'Jamaica', 'JM', 'JAM'),
-('392', 'Japón', 'JP', 'JPN'),
-('832', 'Jersey', 'JE', 'JEY'),
-('400', 'Jordania', 'JO', 'JOR'),
-('398', 'Kazajistán', 'KZ', 'KAZ'),
-('404', 'Kenia', 'KE', 'KEN'),
-('417', 'Kirguistán', 'KG', 'KGZ'),
-('296', 'Kiribati', 'KI', 'KIR'),
-('153', 'Kosovo', 'XK', 'XKX'),
-('414', 'Kuweit', 'KW', 'KWT'),
-('418', 'Laos', 'LA', 'LAO'),
-('426', 'Lesoto', 'LS', 'LSO'),
-('428', 'Letonia', 'LV', 'LVA'),
-('422', 'Libano', 'LB', 'LBN'),
-('430', 'Liberia', 'LR', 'LBR'),
-('434', 'Libia', 'LY', 'LBY'),
-('438', 'Liechtenstein', 'LI', 'LIE'),
-('440', 'Lituania', 'LT', 'LTU'),
-('442', 'Luxemburgo', 'LU', 'LUX'),
-('446', 'Macao', 'MO', 'MAC'),
-('807', 'Macedonia', 'MK', 'MKD'),
-('450', 'Madagascar', 'MG', 'MDG'),
-('458', 'Malasia', 'MY', 'MYS'),
-('454', 'Malaui', 'MW', 'MWI'),
-('462', 'Maldivas', 'MV', 'MDV'),
-('466', 'Mali', 'ML', 'MLI'),
-('470', 'Malta', 'MT', 'MLT'),
-('504', 'Marruecos', 'MA', 'MAR'),
-('474', 'Martinica', 'MQ', 'MTQ'),
-('480', 'Mauricio', 'MU', 'MUS'),
-('478', 'Mauritania', 'MR', 'MRT'),
-('175', 'Mayotte', 'YT', 'MYT'),
-('484', 'México', 'MX', 'MEX'),
-('498', 'Moldavia', 'MD', 'MDA'),
-('492', 'Monaco', 'MC', 'MCO'),
-('496', 'Mongolia', 'MN', 'MNG'),
-('499', 'Monténégro', 'ME', 'MNE'),
-('500', 'Montserrat', 'MS', 'MSR'),
-('508', 'Mozambique', 'MZ', 'MOZ'),
-('516', 'Namibia', 'NA', 'NAM'),
-('520', 'Nauru', 'NR', 'NRU'),
-('524', 'Nepal', 'NP', 'NPL'),
-('558', 'Nicaragua', 'NI', 'NIC'),
-('562', 'Niger', 'NE', 'NER'),
-('566', 'Nigeria', 'NG', 'NGA'),
-('570', 'Niue', 'NU', 'NIU'),
-('578', 'Noruega', 'NO', 'NOR'),
-('540', 'Nueva Caledonia', 'NC', 'NCL'),
-('554', 'Nueva Zelanda', 'NZ', 'NZL'),
-('512', 'Omán', 'OM', 'OMN'),
-('528', 'Países Bajos', 'NL', 'NLD'),
-('586', 'Pakistán', 'PK', 'PAK'),
-('585', 'Palaos', 'PW', 'PLW'),
-('275', 'Palestina', 'PS', 'PSE'),
-('591', 'Panama', 'PA', 'PAN'),
-('598', 'Papúa Nueva Guinea', 'PG', 'PNG'),
-('600', 'Paraguay', 'PY', 'PRY'),
-('604', 'Perú', 'PE', 'PER'),
-('258', 'Polinesia Francesa', 'PF', 'PYF'),
-('616', 'Polonia', 'PL', 'POL'),
-('620', 'Portugal', 'PT', 'PRT'),
-('630', 'Puerto Rico', 'PR', 'PRI'),
-('826', 'Reino Unido', 'GB', 'GBR'),
-('732', 'República árabe Saharaui DemocrÁtica', 'EH', 'ESH'),
-('140', 'República Centroafricana', 'CF', 'CAF'),
-('203', 'República Checa', 'CZ', 'CZE'),
-('178', 'República del Congo', 'CG', 'COG'),
-('180', 'República DemocrÁtica del Congo', 'CD', 'COD'),
-('214', 'República Dominicana', 'DO', 'DOM'),
-('638', 'Reunión', 'RE', 'REU'),
-('646', 'Ruanda', 'RW', 'RWA'),
-('642', 'Rumania', 'RO', 'ROU'),
-('643', 'Rusia', 'RU', 'RUS'),
-('882', 'Samoa', 'WS', 'WSM'),
-('016', 'Samoa Americana', 'AS', 'ASM'),
-('652', 'San Bartolomé', 'BL', 'BLM'),
-('659', 'San Cristóbal y Nieves', 'KN', 'KNA'),
-('674', 'San Marino', 'SM', 'SMR'),
-('534', 'San Martín', 'MF', 'MAF'),
-('666', 'San Pedro y Miquelón', 'PM', 'SPM'),
-('670', 'San Vicente y las Granadinas', 'VC', 'VCT'),
-('662', 'Santa Lucía', 'LC', 'LCA'),
-('678', 'Santo Tomé y Príncipe', 'ST', 'STP'),
-('686', 'Senegal', 'SN', 'SEN'),
-('688', 'Serbia', 'RS', 'SRB'),
-('690', 'Seychelles', 'SC', 'SYC'),
-('694', 'Sierra Leona', 'SL', 'SLE'),
-('702', 'Singapur', 'SG', 'SGP'),
-('654', 'Sint Helena, Ascension and Tristan da Cunha', 'SH', 'SHN'),
-('663', 'Sint-Maarten', 'SX', 'SXM'),
-('760', 'Siria', 'SY', 'SYR'),
-('706', 'Somalia', 'SO', 'SOM'),
-('144', 'Sri Lanka', 'LK', 'LKA'),
-('748', 'eSwatani', 'SZ', 'SWZ'),
-('710', 'Sudáfrica', 'ZA', 'ZAF'),
-('729', 'Sudán', 'SD', 'SDN'),
-('728', 'Sudán del Sur', 'SS', 'SSD'),
-('752', 'Suecia', 'SE', 'SWE'),
-('756', 'Suiza', 'CH', 'CHE'),
-('740', 'Surinam', 'SR', 'SUR'),
-('764', 'Tailandia', 'TH', 'THA'),
-('158', 'Taiwan', 'TW', 'TWN'),
-('834', 'Tanzania', 'TZ', 'TZA'),
-('762', 'Tayikistán', 'TJ', 'TJK'),
-('086', 'Territorio Británico del Océano índico', 'IO', 'IOT'),
-('260', 'Tierras Australes y Antárticas Francesas', 'TF', 'ATF'),
-('626', 'Timor Oriental', 'TL', 'TLS'),
-('768', 'Togo', 'TG', 'TGO'),
-('772', 'Tokelau', 'TK', 'TKL'),
-('776', 'Tonga', 'TO', 'TON'),
-('780', 'Trinidad y Tobago', 'TT', 'TTO'),
-('788', 'Túnez', 'TN', 'TUN'),
-('795', 'Turkmenistán', 'TM', 'TKM'),
-('792', 'Turquía', 'TR', 'TUR'),
-('798', 'Tuvalu', 'TV', 'TUV'),
-('804', 'Ucrania', 'UA', 'UKR'),
-('800', 'Uganda', 'UG', 'UGA'),
-('858', 'Uruguay', 'UY', 'URY'),
-('860', 'Uzbekistán', 'UZ', 'UZB'),
-('548', 'Vanuatu', 'VU', 'VUT'),
-('336', 'Vaticano', 'VA', 'VAT'),
-('862', 'Venezuela', 'VE', 'VEN'),
-('704', 'Vietnam', 'VN', 'VNM'),
-('876', 'Wallis y Futuna', 'WF', 'WLF'),
-('887', 'Yemen', 'YE', 'YEM'),
-('262', 'Yibuti', 'DJ', 'DJI'),
-('894', 'Zambia', 'ZM', 'ZMB'),
-('716', 'Zimbabwe', 'ZW', 'ZWE');
+SELECT ci.name AS ciudad, p.name AS producto, co.name AS empresa, MIN(cp.price) AS precio_mas_bajo
+FROM citiesormunicipalities AS ci
+JOIN companies AS co ON ci.code = co.city_id
+JOIN companyproducts AS cp ON cp.company_id
+JOIN products AS p ON cp.product_id = p.id
+GROUP  BY ci.name, p.name, co.name 
+ORDER BY   ci.name, precio_mas_bajo;
 ```
-## SUBDIVISIONES
-```sql
-INSERT INTO subdivisioncategories (description) VALUES 
-('department'),
-('capital district');
-```
-## STATEORREGIONS
+## 2. Como administrador, deseo obtener el top 5 de clientes que más productos han calificado en los últimos 6 meses.
 
+### RESPUESTA
 ```sql
-INSERT INTO stateorregions (code, name, country_id, code3166, subdivision_id)
-VALUES
-('CO-AMA', 'Amazonas', '170', 'CO-AMA', 1),
-('CO-ANT', 'Antioquia', '170', 'CO-ANT', 1),
-('CO-ARA', 'Arauca', '170', 'CO-ARA', 1),
-('CO-ATL', 'Atlántico', '170', 'CO-ATL', 1),
-('CO-BOL', 'Bolívar', '170', 'CO-BOL', 1),
-('CO-BOY', 'Boyacá', '170', 'CO-BOY', 1),
-('CO-CAL', 'Caldas', '170', 'CO-CAL', 1),
-('CO-CAQ', 'Caquetá', '170', 'CO-CAQ', 1),
-('CO-CAS', 'Casanare', '170', 'CO-CAS', 1),
-('CO-CAU', 'Cauca', '170', 'CO-CAU', 1),
-('CO-CES', 'Cesar', '170', 'CO-CES', 1),
-('CO-CHO', 'Chocó', '170', 'CO-CHO', 1),
-('CO-CUN', 'Cundinamarca', '170', 'CO-CUN', 1),
-('CO-COR', 'Córdoba', '170', 'CO-COR', 1),
-('CO-DC', 'Distrito Capital de Bogotá', '170', 'CO-DC', 2),
-('CO-GUA', 'Guainía', '170', 'CO-GUA', 1),
-('CO-GUV', 'Guaviare', '170', 'CO-GUV', 1),
-('CO-HUI', 'Huila', '170', 'CO-HUI', 1),
-('CO-LAG', 'La Guajira', '170', 'CO-LAG', 1),
-('CO-MAG', 'Magdalena', '170', 'CO-MAG', 1),
-('CO-MET', 'Meta', '170', 'CO-MET', 1),
-('CO-NAR', 'Nariño', '170', 'CO-NAR', 1),
-('CO-NSA', 'Norte de Santander', '170', 'CO-NSA', 1),
-('CO-PUT', 'Putumayo', '170', 'CO-PUT', 1),
-('CO-QUI', 'Quindío', '170', 'CO-QUI', 1),
-('CO-RIS', 'Risaralda', '170', 'CO-RIS', 1),
-('CO-SAP', 'San Andrés, Providencia y Santa Catalina', '170', 'CO-SAP', 1),
-('CO-SAN', 'Santander', '170', 'CO-SAN', 1),
-('CO-SUC', 'Sucre', '170', 'CO-SUC', 1),
-('CO-TOL', 'Tolima', '170', 'CO-TOL', 1),
-('CO-VAC', 'Valle del Cauca', '170', 'CO-VAC', 1),
-('CO-VAU', 'Vaupés', '170', 'CO-VAU', 1),
-('CO-VID', 'Vichada', '170', 'CO-VID', 1);
-```
-## CITIES
-```sql
-
+SELECT c.id AS cliente_id,c.name AS nombre_cliente,COUNT(DISTINCT qp.product_id) AS cantidad_productos_calificados,ROUND(AVG(qp.rating), 2) AS promedio
+FROM customers AS c
+JOIN quality_products AS qp ON c.id = qp.customer_id
+WHERE qp.daterating >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+GROUP BY c.id, c.name 
+ORDER BY cantidad_productos_calificados DESC, promedio DESC LIMIT 5;
 
 ```
+## 3. Como gerente de ventas, quiero ver la distribución de productos por categoría y unidad de medida.
+
+### RESPUESTA
+ ```sql
+ SELECT p.category_id, cp.unimeasure_id, COUNT(*) AS total_productos
+ FROM products AS p
+ JOIN companyproducts AS cp ON p.id = cp.product_id
+ GROUP BY p.category_id, cp.unimeasure_id; 
+ ```
+## 4. Como cliente, quiero saber qué productos tienen calificaciones superiores al promedio general.
+
+### RESPUESTA
+```sql
+SELECT 
+    p.name AS producto,
+    ROUND(AVG(q.rating), 2) AS calificacion_promedio,
+    (SELECT ROUND(AVG(rating), 2) FROM quality_products) AS promedio_general,
+    COUNT(*) AS total_calificaciones
+FROM 
+    products p 
+JOIN 
+    quality_products AS q ON p.id = q.product_id
+GROUP BY 
+    p.id, p.name
+HAVING 
+    AVG(q.rating) > (SELECT AVG(rating) FROM quality_products)
+ORDER BY 
+    calificacion_promedio DESC;
+```
+## 5. Como auditor, quiero conocer todas las empresas que no han recibido ninguna calificación.
+### REPUESTA
+```sql
+SELECT c.id AS compania_id, c.name AS NOMBRE
+FROM companies AS c
+LEFT JOIN rates AS r ON c.id = r.company_id
+LEFT JOIN quality_products AS qp ON c.id = qp.company_id
+WHERE r.company_id IS NULL AND qp.company_id IS NULL;
+
+```
+
+## 6. Como operador, deseo obtener los productos que han sido añadidos como favoritos por más de 10 clientes distintos.
+
+### RESPUESTA
+```sql
+SELECT p.id AS producto_id, p.name AS nombre, COUNT(DISTINCT f.customer_id) AS total_clientes
+FROM products AS p
+JOIN details_favorites AS df ON p.id = df.product_id
+JOIN favorites AS f ON df.favorite_id = f.id
+GROUP BY p.id, p.name
+HAVING COUNT(DISTINCT f.customer_id) > 10;
+```
+## 7. Como gerente regional, quiero obtener todas las empresas activas por ciudad y categoría.
+
+### RESPUESTA
+
+```sql
+SELECT c.city_id,c.category_id,COUNT(DISTINCT c.id) AS empresas_activas
+FROM companies AS c
+JOIN companyproducts cp ON c.id = cp.company_id
+GROUP BY c.city_id, c.category_id;
+```
+## 8. Como especialista en marketing, deseo obtener los 10 productos más calificados en cada ciudad.
+
+### RESPUESTA
+```sql
+SELECT ci.name AS ciuadad,
+p.name AS producto,
+COUNT(qp.rating) AS total_calificaciones,
+ROUND(AVG(qp.rating), 2) AS promedio_calificacion
+FROM citiesormunicipalities AS ci
+JOIN companies AS co ON ci.code = co.city_id
+JOIN quality_products qp ON co.id = qp.company_id
+JOIN products AS p ON qp.product_id = p.id
+GROUP BY ci.name, p.name
+ORDER BY ci.name, total_calificaciones DESC LIMIT 10;
+```
+
+## 9. Como técnico, quiero identificar productos sin unidad de medida asignada.
+
+### RESPUESTA
+```sql
+SELECT p.id AS producto_id, p.name AS nombre_producto
+FROM products AS p
+LEFT JOIN companyproducts AS cp ON p.id = cp.product_id
+WHERE cp.unimeasure_id IS NULL
+ORDER BY p.name;
+```
+## 10. Como gestor de beneficios, deseo ver los planes de membresía sin beneficios registrados.
+
+### RESPUESTA
+```sql
+SELECT m.id AS membresia_id, m.name AS nombre_membresia,m.description AS descripcion
+FROM memberships AS m
+LEFT JOIN membershipbenefits AS mb ON m.id = mb.membership_id
+WHERE mb.membership_id IS NULL
+ORDER BY m.name;
+```
+## 11. Como supervisor, quiero obtener los productos de una categoría específica con su promedio de calificación.
+
+### RESPUESTA
+```sql
+SELECT p.id AS producto_id, p.name AS nombre, AVG(qp.rating) AS promedio
+FROM products AS p
+JOIN quality_products AS qp ON p.id = qp.product_id
+WHERE p.category_id = 1
+GROUP BY p.id, p.name;
+
+```
+## 12. Como asesor, deseo obtener los clientes que han comprado productos de más de una empresa.
+### RESPUESTA
+```sql
+SELECT qp.customer_id, cu.name AS nombre_cliente, COUNT(DISTINCT qp.company_id) AS total_empresas
+FROM quality_products AS qp
+JOIN customers AS cu ON qp.customer_id = cu.id
+GROUP BY qp.customer_id, cu.name
+HAVING COUNT(DISTINCT qp.company_id) > 1;
+```
+## 13. Como director, quiero identificar las ciudades con más clientes activos.
+
+### REPUESTA
+```sql
+SELECT c.name AS ciudad, COUNT(DISTINCT cu.id) AS total_clientes,s.name AS region,
+co.name AS pais
+FROM citiesormunicipalities AS c 
+JOIN customers AS cu ON c.code = cu.city_id
+JOIN stateorregions AS s ON c.statereg_id = s.code
+JOIN countries AS co ON s.country_id = co.isocode
+GROUP BY c.name, s.name, co.name
+HAVING COUNT(DISTINCT cu.id) > 0
+ORDER BY  total_clientes DESC;
+```
+## 14. Como analista de calidad, deseo obtener el ranking de productos por empresa basado en la media de `quality_products`.
+
+### RESPUESTA
+```sql
+SELECT co.name AS empresa,p.name AS producto,ROUND(AVG(qp.rating), 2) AS promedio_calificacion,COUNT(qp.rating) AS total_calificaciones,DENSE_RANK() OVER(PARTITION BY co.name ORDER BY AVG(qp.rating) DESC) AS ranking_calidad
+FROM companies co
+JOIN quality_products qp ON co.id = qp.company_id
+JOIN products p ON qp.product_id = p.id
+GROUP BY co.name, p.name
+HAVING COUNT(qp.rating) >= 3 
+ORDER BY co.name,promedio_calificacion DESC;
+
+```
+## 15. Como administrador, quiero listar empresas que ofrecen más de cinco productos distintos.
+
+### REPUESTA
+```sql
+SELECT c.id AS empresa_id, c.name AS empresa, COUNT(DISTINCT cp.product_id) AS total_productos
+FROM companies AS c
+JOIN companyproducts AS cp ON c.id = cp.company_id
+GROUP BY c.id,c.name
+HAVING COUNT(DISTINCT cp.product_id) > 5;
+```
+## 16. Como cliente, deseo visualizar los productos favoritos que aún no han sido calificados.
+
+### RESPUESTA
+
+```sql
+SELECT p.id AS producto_id,p.name AS producto_nombre,
+f.customer_id
+FROM favorites AS f
+JOIN details_favorites AS df ON f.id = df.favorite_id
+JOIN products AS p ON df.product_id = p.id
+LEFT JOIN quality_products AS qp ON p.id = qp.product_id AND f.customer_id = qp.customer_id
+WHERE qp.product_id IS NULL;
+```
+## 17. Como desarrollador, deseo consultar los beneficios asignados a cada audiencia junto con su descripción.
+
+### RESPUESTA
+```sql
+SELECT 
+    a.id AS audiencia_id,
+    a.description AS audiencia,
+    b.id AS beneficio_id,
+    b.description AS beneficio,
+    b.detail AS detalle
+FROM audiencebenefits ab
+JOIN audiences a ON ab.audience_id = a.id
+JOIN benefits b ON ab.benefit_id = b.id
+ORDER BY a.id, b.id;
+```
+## 18. Como operador logístico, quiero saber en qué ciudades hay empresas sin productos asociados.
+
+### RESPUESTA
+
+```sql
+SELECT 
+    cm.code AS ciudad_id,
+    cm.name AS ciudad_nombre,
+    COUNT(c.id) AS empresas_sin_productos
+FROM companies c
+JOIN citiesormunicipalities cm ON c.city_id = cm.code
+LEFT JOIN companyproducts cp ON c.id = cp.company_id
+WHERE cp.product_id IS NULL
+GROUP BY cm.code, cm.name;
+```
+## 19. Como técnico, deseo obtener todas las empresas con productos duplicados por nombre.
+
+### RESPUESTA
+```sql
+SELECT 
+    c.id AS empresa_id,
+    c.name AS empresa_nombre,
+    p.name AS nombre_producto,
+    COUNT(*) AS veces_repetido
+FROM companies c
+JOIN companyproducts cp ON c.id = cp.company_id
+JOIN products p ON cp.product_id = p.id
+GROUP BY c.id, p.name
+HAVING COUNT(*) > 1
+ORDER BY c.id, veces_repetido DESC;
+```
+## 20. Como analista, quiero una vista resumen de clientes, productos favoritos y promedio de calificación recibido.
+
+
+### RESPUESTAS
+
+```sql
+SELECT 
+    c.id AS cliente_id,
+    c.name AS nombre_cliente,
+    c.email AS email_cliente,
+    COUNT(DISTINCT f.id) AS total_favoritos,
+    COUNT(DISTINCT qp.product_id) AS productos_calificados,
+    ROUND(AVG(qp.rating), 2) AS promedio_calificaciones,
+    GROUP_CONCAT(DISTINCT p.name SEPARATOR ' | ') AS productos_favoritos
+FROM 
+    customers c
+LEFT JOIN 
+    favorites f ON c.id = f.customer_id
+LEFT JOIN 
+    details_favorites df ON f.id = df.favorite_id
+LEFT JOIN 
+    products p ON df.product_id = p.id
+LEFT JOIN 
+    quality_products qp ON c.id = qp.customer_id
+GROUP BY 
+    c.id, c.name, c.email
+ORDER BY 
+    total_favoritos DESC, promedio_calificaciones DESC;
+
+```
+------
+
+## 🔹 **2. Subconsultas**
+
+1. Como gerente, quiero ver los productos cuyo precio esté por encima del promedio de su categoría.
+2. Como administrador, deseo listar las empresas que tienen más productos que la media de empresas.
+3. Como cliente, quiero ver mis productos favoritos que han sido calificados por otros clientes.
+4. Como supervisor, deseo obtener los productos con el mayor número de veces añadidos como favoritos.
+5. Como técnico, quiero listar los clientes cuyo correo no aparece en la tabla `rates` ni en `quality_products`.
+6. Como gestor de calidad, quiero obtener los productos con una calificación inferior al mínimo de su categoría.
+7. Como desarrollador, deseo listar las ciudades que no tienen clientes registrados.
+8. Como administrador, quiero ver los productos que no han sido evaluados en ninguna encuesta.
+9. Como auditor, quiero listar los beneficios que no están asignados a ninguna audiencia.
+10. Como cliente, deseo obtener mis productos favoritos que no están disponibles actualmente en ninguna empresa.
+11. Como director, deseo consultar los productos vendidos en empresas cuya ciudad tenga menos de tres empresas registradas.
+12. Como analista, quiero ver los productos con calidad superior al promedio de todos los productos.
+13. Como gestor, quiero ver empresas que sólo venden productos de una única categoría.
+14. Como gerente comercial, quiero consultar los productos con el mayor precio entre todas las empresas.
+15. Como cliente, quiero saber si algún producto de mis favoritos ha sido calificado por otro cliente con más de 4 estrellas.
+16. Como operador, quiero saber qué productos no tienen imagen asignada pero sí han sido calificados.
+17. Como auditor, quiero ver los planes de membresía sin periodo vigente.
+18. Como especialista, quiero identificar los beneficios compartidos por más de una audiencia.
+19. Como técnico, quiero encontrar empresas cuyos productos no tengan unidad de medida definida.
+20. Como gestor de campañas, deseo obtener los clientes con membresía activa y sin productos favoritos.
+
+------
+
+## 🔹 **3. Funciones Agregadas**
+
+1. ### **1. Obtener el promedio de calificación por producto**
+
+   > *"Como analista, quiero obtener el promedio de calificación por producto."*
+
+   🔍 **Explicación para dummies:**
+    La persona encargada de revisar el rendimiento quiere saber **qué tan bien calificado está cada producto**. Con `AVG(rating)` agrupado por `product_id`, puede verlo de forma resumida.
+
+   ------
+
+   ### **2. Contar cuántos productos ha calificado cada cliente**
+
+   > *"Como gerente, desea contar cuántos productos ha calificado cada cliente."*
+
+   🔍 **Explicación:**
+    Aquí se quiere saber **quiénes están activos opinando**. Se usa `COUNT(*)` sobre `rates`, agrupando por `customer_id`.
+
+   ------
+
+   ### **3. Sumar el total de beneficios asignados por audiencia**
+
+   > *"Como auditor, quiere sumar el total de beneficios asignados por audiencia."*
+
+   🔍 **Explicación:**
+    El auditor busca **cuántos beneficios tiene cada tipo de usuario**. Con `COUNT(*)` agrupado por `audience_id` en `audiencebenefits`, lo obtiene.
+
+   ------
+
+   ### **4. Calcular la media de productos por empresa**
+
+   > *"Como administrador, desea conocer la media de productos por empresa."*
+
+   🔍 **Explicación:**
+    El administrador quiere saber si **las empresas están ofreciendo pocos o muchos productos**. Cuenta los productos por empresa y saca el promedio con `AVG(cantidad)`.
+
+   ------
+
+   ### **5. Contar el total de empresas por ciudad**
+
+   > *"Como supervisor, quiere ver el total de empresas por ciudad."*
+
+   🔍 **Explicación:**
+    La idea es ver **en qué ciudades hay más movimiento empresarial**. Se usa `COUNT(*)` en `companies`, agrupando por `city_id`.
+
+   ------
+
+   ### **6. Calcular el promedio de precios por unidad de medida**
+
+   > *"Como técnico, desea obtener el promedio de precios de productos por unidad de medida."*
+
+   🔍 **Explicación:**
+    Se necesita saber si **los precios son coherentes según el tipo de medida**. Con `AVG(price)` agrupado por `unit_id`, se compara cuánto cuesta el litro, kilo, unidad, etc.
+
+   ------
+
+   ### **7. Contar cuántos clientes hay por ciudad**
+
+   > *"Como gerente, quiere ver el número de clientes registrados por cada ciudad."*
+
+   🔍 **Explicación:**
+    Con `COUNT(*)` agrupado por `city_id` en la tabla `customers`, se obtiene **la cantidad de clientes que hay en cada zona**.
+
+   ------
+
+   ### **8. Calcular planes de membresía por periodo**
+
+   > *"Como operador, desea contar cuántos planes de membresía existen por periodo."*
+
+   🔍 **Explicación:**
+    Sirve para ver **qué tantos planes están vigentes cada mes o trimestre**. Se agrupa por periodo (`start_date`, `end_date`) y se cuenta cuántos registros hay.
+
+   ------
+
+   ### **9. Ver el promedio de calificaciones dadas por un cliente a sus favoritos**
+
+   > *"Como cliente, quiere ver el promedio de calificaciones que ha otorgado a sus productos favoritos."*
+
+   🔍 **Explicación:**
+    El cliente quiere saber **cómo ha calificado lo que más le gusta**. Se hace un `JOIN` entre favoritos y calificaciones, y se saca `AVG(rating)`.
+
+   ------
+
+   ### **10. Consultar la fecha más reciente en que se calificó un producto**
+
+   > *"Como auditor, desea obtener la fecha más reciente en la que se calificó un producto."*
+
+   🔍 **Explicación:**
+    Busca el `MAX(created_at)` agrupado por producto. Así sabe **cuál fue la última vez que se evaluó cada uno**.
+
+   ------
+
+   ### **11. Obtener la desviación estándar de precios por categoría**
+
+   > *"Como desarrollador, quiere conocer la variación de precios por categoría de producto."*
+
+   🔍 **Explicación:**
+    Usando `STDDEV(price)` en `companyproducts` agrupado por `category_id`, se puede ver **si hay mucha diferencia de precios dentro de una categoría**.
+
+   ------
+
+   ### **12. Contar cuántas veces un producto fue favorito**
+
+   > *"Como técnico, desea contar cuántas veces un producto fue marcado como favorito."*
+
+   🔍 **Explicación:**
+    Con `COUNT(*)` en `details_favorites`, agrupado por `product_id`, se obtiene **cuáles productos son los más populares entre los clientes**.
+
+   ------
+
+   ### **13. Calcular el porcentaje de productos evaluados**
+
+   > *"Como director, quiere saber qué porcentaje de productos han sido calificados al menos una vez."*
+
+   🔍 **Explicación:**
+    Cuenta cuántos productos hay en total y cuántos han sido evaluados (`rates`). Luego calcula `(evaluados / total) * 100`.
+
+   ------
+
+   ### **14. Ver el promedio de rating por encuesta**
+
+   > *"Como analista, desea conocer el promedio de rating por encuesta."*
+
+   🔍 **Explicación:**
+    Agrupa por `poll_id` en `rates`, y calcula el `AVG(rating)` para ver **cómo se comportó cada encuesta**.
+
+   ------
+
+   ### **15. Calcular el promedio y total de beneficios por plan**
+
+   > *"Como gestor, quiere obtener el promedio y el total de beneficios asignados a cada plan de membresía."*
+
+   🔍 **Explicación:**
+    Agrupa por `membership_id` en `membershipbenefits`, y usa `COUNT(*)` y `AVG(beneficio)` si aplica (si hay ponderación).
+
+   ------
+
+   ### **16. Obtener media y varianza de precios por empresa**
+
+   > *"Como gerente, desea obtener la media y la varianza del precio de productos por empresa."*
+
+   🔍 **Explicación:**
+    Se agrupa por `company_id` y se usa `AVG(price)` y `VARIANCE(price)` para saber **qué tan consistentes son los precios por empresa**.
+
+   ------
+
+   ### **17. Ver total de productos disponibles en la ciudad del cliente**
+
+   > *"Como cliente, quiere ver cuántos productos están disponibles en su ciudad."*
+
+   🔍 **Explicación:**
+    Hace un `JOIN` entre `companies`, `companyproducts` y `citiesormunicipalities`, filtrando por la ciudad del cliente. Luego se cuenta.
+
+   ------
+
+   ### **18. Contar productos únicos por tipo de empresa**
+
+   > *"Como administrador, desea contar los productos únicos por tipo de empresa."*
+
+   🔍 **Explicación:**
+    Agrupa por `company_type_id` y cuenta cuántos productos diferentes tiene cada tipo de empresa.
+
+   ------
+
+   ### **19. Ver total de clientes sin correo electrónico registrado**
+
+   > *"Como operador, quiere saber cuántos clientes no han registrado su correo."*
+
+   🔍 **Explicación:**
+    Filtra `customers WHERE email IS NULL` y hace un `COUNT(*)`. Esto ayuda a mejorar la base de datos para campañas.
+
+   ------
+
+   ### **20. Empresa con más productos calificados**
+
+   > *"Como especialista, desea obtener la empresa con el mayor número de productos calificados."*
+
+   🔍 **Explicación:**
+    Hace un `JOIN` entre `companies`, `companyproducts`, y `rates`, agrupa por empresa y usa `COUNT(DISTINCT product_id)`, ordenando en orden descendente y tomando solo el primero.
+
+------
+
+## 🔹 **4. Procedimientos Almacenados**
+
+1. ### **1. Registrar una nueva calificación y actualizar el promedio**
+
+   > *"Como desarrollador, quiero un procedimiento que registre una calificación y actualice el promedio del producto."*
+
+   🧠 **Explicación:**
+    Este procedimiento recibe `product_id`, `customer_id` y `rating`, inserta la nueva fila en `rates`, y recalcula automáticamente el promedio en la tabla `products` (campo `average_rating`).
+
+   ------
+
+   ### **2. Insertar empresa y asociar productos por defecto**
+
+   > *"Como administrador, deseo un procedimiento para insertar una empresa y asociar productos por defecto."*
+
+   🧠 **Explicación:**
+    Este procedimiento inserta una empresa en `companies`, y luego vincula automáticamente productos predeterminados en `companyproducts`.
+
+   ------
+
+   ### **3. Añadir producto favorito validando duplicados**
+
+   > *"Como cliente, quiero un procedimiento que añada un producto favorito y verifique duplicados."*
+
+   🧠 **Explicación:**
+    Verifica si el producto ya está en favoritos (`details_favorites`). Si no lo está, lo inserta. Evita duplicaciones silenciosamente.
+
+   ------
+
+   ### **4. Generar resumen mensual de calificaciones por empresa**
+
+   > *"Como gestor, deseo un procedimiento que genere un resumen mensual de calificaciones por empresa."*
+
+   🧠 **Explicación:**
+    Hace una consulta agregada con `AVG(rating)` por empresa, y guarda los resultados en una tabla de resumen tipo `resumen_calificaciones`.
+
+   ------
+
+   ### **5. Calcular beneficios activos por membresía**
+
+   > *"Como supervisor, quiero un procedimiento que calcule beneficios activos por membresía."*
+
+   🧠 **Explicación:**
+    Consulta `membershipbenefits` junto con `membershipperiods`, y devuelve una lista de beneficios vigentes según la fecha actual.
+
+   ------
+
+   ### **6. Eliminar productos huérfanos**
+
+   > *"Como técnico, deseo un procedimiento que elimine productos sin calificación ni empresa asociada."*
+
+   🧠 **Explicación:**
+    Elimina productos de la tabla `products` que no tienen relación ni en `rates` ni en `companyproducts`.
+
+   ------
+
+   ### **7. Actualizar precios de productos por categoría**
+
+   > *"Como operador, quiero un procedimiento que actualice precios de productos por categoría."*
+
+   🧠 **Explicación:**
+    Recibe un `categoria_id` y un `factor` (por ejemplo 1.05), y multiplica todos los precios por ese factor en la tabla `companyproducts`.
+
+   ------
+
+   ### **8. Validar inconsistencia entre `rates` y `quality_products`**
+
+   > *"Como auditor, deseo un procedimiento que liste inconsistencias entre `rates` y `quality_products`."*
+
+   🧠 **Explicación:**
+    Busca calificaciones (`rates`) que no tengan entrada correspondiente en `quality_products`. Inserta el error en una tabla `errores_log`.
+
+   ------
+
+   ### **9. Asignar beneficios a nuevas audiencias**
+
+   > *"Como desarrollador, quiero un procedimiento que asigne beneficios a nuevas audiencias."*
+
+   🧠 **Explicación:**
+    Recibe un `benefit_id` y `audience_id`, verifica si ya existe el registro, y si no, lo inserta en `audiencebenefits`.
+
+   ------
+
+   ### **10. Activar planes de membresía vencidos con pago confirmado**
+
+   > *"Como administrador, deseo un procedimiento que active planes de membresía vencidos si el pago fue confirmado."*
+
+   🧠 **Explicación:**
+    Actualiza el campo `status` a `'ACTIVA'` en `membershipperiods` donde la fecha haya vencido pero el campo `pago_confirmado` sea `TRUE`.
+
+   ------
+
+   ### **11. Listar productos favoritos del cliente con su calificación**
+
+   > *"Como cliente, deseo un procedimiento que me devuelva todos mis productos favoritos con su promedio de rating."*
+
+   🧠 **Explicación:**
+    Consulta todos los productos favoritos del cliente y muestra el promedio de calificación de cada uno, uniendo `favorites`, `rates` y `products`.
+
+   ------
+
+   ### **12. Registrar encuesta y sus preguntas asociadas**
+
+   > *"Como gestor, quiero un procedimiento que registre una encuesta y sus preguntas asociadas."*
+
+   🧠 **Explicación:**
+    Inserta la encuesta principal en `polls` y luego cada una de sus preguntas en otra tabla relacionada como `poll_questions`.
+
+   ------
+
+   ### **13. Eliminar favoritos antiguos sin calificaciones**
+
+   > *"Como técnico, deseo un procedimiento que borre favoritos antiguos no calificados en más de un año."*
+
+   🧠 **Explicación:**
+    Filtra productos favoritos que no tienen calificaciones recientes y fueron añadidos hace más de 12 meses, y los elimina de `details_favorites`.
+
+   ------
+
+   ### **14. Asociar beneficios automáticamente por audiencia**
+
+   > *"Como operador, quiero un procedimiento que asocie automáticamente beneficios por audiencia."*
+
+   🧠 **Explicación:**
+    Inserta en `audiencebenefits` todos los beneficios que apliquen según una lógica predeterminada (por ejemplo, por tipo de usuario).
+
+   ------
+
+   ### **15. Historial de cambios de precio**
+
+   > *"Como administrador, deseo un procedimiento para generar un historial de cambios de precio."*
+
+   🧠 **Explicación:**
+    Cada vez que se cambia un precio, el procedimiento compara el anterior con el nuevo y guarda un registro en una tabla `historial_precios`.
+
+   ------
+
+   ### **16. Registrar encuesta activa automáticamente**
+
+   > *"Como desarrollador, quiero un procedimiento que registre automáticamente una nueva encuesta activa."*
+
+   🧠 **Explicación:**
+    Inserta una encuesta en `polls` con el campo `status = 'activa'` y una fecha de inicio en `NOW()`.
+
+   ------
+
+   ### **17. Actualizar unidad de medida de productos sin afectar ventas**
+
+   > *"Como técnico, deseo un procedimiento que actualice la unidad de medida de productos sin afectar si hay ventas."*
+
+   🧠 **Explicación:**
+    Verifica si el producto no ha sido vendido, y si es así, permite actualizar su `unit_id`.
+
+   ------
+
+   ### **18. Recalcular promedios de calidad semanalmente**
+
+   > *"Como supervisor, quiero un procedimiento que recalcule todos los promedios de calidad cada semana."*
+
+   🧠 **Explicación:**
+    Hace un `AVG(rating)` agrupado por producto y lo actualiza en `products`.
+
+   ------
+
+   ### **19. Validar claves foráneas entre calificaciones y encuestas**
+
+   > *"Como auditor, deseo un procedimiento que valide claves foráneas cruzadas entre calificaciones y encuestas."*
+
+   🧠 **Explicación:**
+    Busca registros en `rates` con `poll_id` que no existen en `polls`, y los reporta.
+
+   ------
+
+   ### **20. Generar el top 10 de productos más calificados por ciudad**
+
+   > *"Como gerente, quiero un procedimiento que genere el top 10 de productos más calificados por ciudad."*
+
+   🧠 **Explicación:**
+    Agrupa las calificaciones por ciudad (a través de la empresa que lo vende) y selecciona los 10 productos con más evaluaciones.
+
+------
+
+## 🔹 **5. Triggers**
+
+1. ### 🔎 **1. Actualizar la fecha de modificación de un producto**
+
+   > "Como desarrollador, deseo un trigger que actualice la fecha de modificación cuando se actualice un producto."
+
+   🧠 **Explicación:**
+    Cada vez que se actualiza un producto, queremos que el campo `updated_at` se actualice automáticamente con la fecha actual (`NOW()`), sin tener que hacerlo manualmente desde la app.
+
+   🔁 Se usa un `BEFORE UPDATE`.
+
+   ------
+
+   ### 🔎 **2. Registrar log cuando un cliente califica un producto**
+
+   > "Como administrador, quiero un trigger que registre en log cuando un cliente califica un producto."
+
+   🧠 **Explicación:**
+    Cuando alguien inserta una fila en `rates`, el trigger crea automáticamente un registro en `log_acciones` con la información del cliente y producto calificado.
+
+   🔁 Se usa un `AFTER INSERT` sobre `rates`.
+
+   ------
+
+   ### 🔎 **3. Impedir insertar productos sin unidad de medida**
+
+   > "Como técnico, deseo un trigger que impida insertar productos sin unidad de medida."
+
+   🧠 **Explicación:**
+    Antes de guardar un nuevo producto, el trigger revisa si `unit_id` es `NULL`. Si lo es, lanza un error con `SIGNAL`.
+
+   🔁 Se usa un `BEFORE INSERT`.
+
+   ------
+
+   ### 🔎 **4. Validar calificaciones no mayores a 5**
+
+   > "Como auditor, quiero un trigger que verifique que las calificaciones no superen el valor máximo permitido."
+
+   🧠 **Explicación:**
+    Si alguien intenta insertar una calificación de 6 o más, se bloquea automáticamente. Esto evita errores o trampa.
+
+   🔁 Se usa un `BEFORE INSERT`.
+
+   ------
+
+   ### 🔎 **5. Actualizar estado de membresía cuando vence**
+
+   > "Como supervisor, deseo un trigger que actualice automáticamente el estado de membresía al vencer el periodo."
+
+   🧠 **Explicación:**
+    Cuando se actualiza un periodo de membresía (`membershipperiods`), si `end_date` ya pasó, se puede cambiar el campo `status` a 'INACTIVA'.
+
+   🔁 `AFTER UPDATE` o `BEFORE UPDATE` dependiendo de la lógica.
+
+   ------
+
+   ### 🔎 **6. Evitar duplicados de productos por empresa**
+
+   > "Como operador, quiero un trigger que evite duplicar productos por nombre dentro de una misma empresa."
+
+   🧠 **Explicación:**
+    Antes de insertar un nuevo producto en `companyproducts`, el trigger puede consultar si ya existe uno con el mismo `product_id` y `company_id`.
+
+   🔁 `BEFORE INSERT`.
+
+   ------
+
+   ### 🔎 **7. Enviar notificación al añadir un favorito**
+
+   > "Como cliente, deseo un trigger que envíe notificación cuando añado un producto como favorito."
+
+   🧠 **Explicación:**
+    Después de un `INSERT` en `details_favorites`, el trigger agrega un mensaje a una tabla `notificaciones`.
+
+   🔁 `AFTER INSERT`.
+
+   ------
+
+   ### 🔎 **8. Insertar fila en `quality_products` tras calificación**
+
+   > "Como técnico, quiero un trigger que inserte una fila en `quality_products` cuando se registra una calificación."
+
+   🧠 **Explicación:**
+    Al insertar una nueva calificación en `rates`, se crea automáticamente un registro en `quality_products` para mantener métricas de calidad.
+
+   🔁 `AFTER INSERT`.
+
+   ------
+
+   ### 🔎 **9. Eliminar favoritos si se elimina el producto**
+
+   > "Como desarrollador, deseo un trigger que elimine los favoritos si se elimina el producto."
+
+   🧠 **Explicación:**
+    Cuando se borra un producto, el trigger elimina las filas en `details_favorites` donde estaba ese producto.
+
+   🔁 `AFTER DELETE` en `products`.
+
+   ------
+
+   ### 🔎 **10. Bloquear modificación de audiencias activas**
+
+   > "Como administrador, quiero un trigger que bloquee la modificación de audiencias activas."
+
+   🧠 **Explicación:**
+    Si un usuario intenta modificar una audiencia que está en uso, el trigger lanza un error con `SIGNAL`.
+
+   🔁 `BEFORE UPDATE`.
+
+   ------
+
+   ### 🔎 **11. Recalcular promedio de calidad del producto tras nueva evaluación**
+
+   > "Como gestor, deseo un trigger que actualice el promedio de calidad del producto tras una nueva evaluación."
+
+   🧠 **Explicación:**
+    Después de insertar en `rates`, el trigger actualiza el campo `average_rating` del producto usando `AVG()`.
+
+   🔁 `AFTER INSERT`.
+
+   ------
+
+   ### 🔎 **12. Registrar asignación de nuevo beneficio**
+
+   > "Como auditor, quiero un trigger que registre cada vez que se asigna un nuevo beneficio."
+
+   🧠 **Explicación:**
+    Cuando se hace `INSERT` en `membershipbenefits` o `audiencebenefits`, se agrega un log en `bitacora`.
+
+   ------
+
+   ### 🔎 **13. Impedir doble calificación por parte del cliente**
+
+   > "Como cliente, deseo un trigger que me impida calificar el mismo producto dos veces seguidas."
+
+   🧠 **Explicación:**
+    Antes de insertar en `rates`, el trigger verifica si ya existe una calificación de ese `customer_id` y `product_id`.
+
+   ------
+
+   ### 🔎 **14. Validar correos duplicados en clientes**
+
+   > "Como técnico, quiero un trigger que valide que el email del cliente no se repita."
+
+   🧠 **Explicación:**
+    Verifica, antes del `INSERT`, si el correo ya existe en la tabla `customers`. Si sí, lanza un error.
+
+   ------
+
+   ### 🔎 **15. Eliminar detalles de favoritos huérfanos**
+
+   > "Como operador, deseo un trigger que elimine registros huérfanos de `details_favorites`."
+
+   🧠 **Explicación:**
+    Si se elimina un registro de `favorites`, se borran automáticamente sus detalles asociados.
+
+   ------
+
+   ### 🔎 **16. Actualizar campo `updated_at` en `companies`**
+
+   > "Como administrador, quiero un trigger que actualice el campo `updated_at` en `companies`."
+
+   🧠 **Explicación:**
+    Como en productos, actualiza automáticamente la fecha de última modificación cada vez que se cambia algún dato.
+
+   ------
+
+   ### 🔎 **17. Impedir borrar ciudad si hay empresas activas**
+
+   > "Como desarrollador, deseo un trigger que impida borrar una ciudad si hay empresas activas en ella."
+
+   🧠 **Explicación:**
+    Antes de hacer `DELETE` en `citiesormunicipalities`, el trigger revisa si hay empresas registradas en esa ciudad.
+
+   ------
+
+   ### 🔎 **18. Registrar cambios de estado en encuestas**
+
+   > "Como auditor, quiero un trigger que registre cambios de estado de encuestas."
+
+   🧠 **Explicación:**
+    Cada vez que se actualiza el campo `status` en `polls`, el trigger guarda la fecha, nuevo estado y usuario en un log.
+
+   ------
+
+   ### 🔎 **19. Sincronizar `rates` y `quality_products`**
+
+   > "Como supervisor, deseo un trigger que sincronice `rates` con `quality_products` al calificar."
+
+   🧠 **Explicación:**
+    Inserta o actualiza la calidad del producto en `quality_products` cada vez que se inserta una nueva calificación.
+
+   ------
+
+   ### 🔎 **20. Eliminar productos sin relación a empresas**
+
+   > "Como operador, quiero un trigger que elimine automáticamente productos sin relación a empresas."
+
+   🧠 **Explicación:**
+    Después de borrar la última relación entre un producto y una empresa (`companyproducts`), el trigger puede eliminar ese producto.
+
+------
+
+## 🔹 **6. Events (Eventos Programados..Usar procedimientos o funciones para cada evento)**
+
+1. ## 🔹 **1. Borrar productos sin actividad cada 6 meses**
+
+   > **Historia:** Como administrador, quiero un evento que borre productos sin actividad cada 6 meses.
+
+   🧠 **Explicación:**
+    Algunos productos pueden haber sido creados pero nunca calificados, marcados como favoritos ni asociados a una empresa. Este evento eliminaría esos productos cada 6 meses.
+
+   🛠️ **Se usaría un `DELETE`** sobre `products` donde no existan registros en `rates`, `favorites` ni `companyproducts`.
+
+   📅 **Frecuencia del evento:** `EVERY 6 MONTH`
+
+   ------
+
+   ## 🔹 **2. Recalcular el promedio de calificaciones semanalmente**
+
+   > **Historia:** Como supervisor, deseo un evento semanal que recalcula el promedio de calificaciones.
+
+   🧠 **Explicación:**
+    Se puede tener una tabla `product_metrics` que almacena promedios pre-calculados para rapidez. El evento actualizaría esa tabla con nuevos promedios.
+
+   🛠️ **Usa `UPDATE` con `AVG(rating)` agrupado por producto.**
+
+   📅 Frecuencia: `EVERY 1 WEEK`
+
+   ------
+
+   ## 🔹 **3. Actualizar precios según inflación mensual**
+
+   > **Historia:** Como operador, quiero un evento mensual que actualice los precios de productos por inflación.
+
+   🧠 **Explicación:**
+    Aplicar un porcentaje de aumento (por ejemplo, 3%) a los precios de todos los productos.
+
+   🛠️ `UPDATE companyproducts SET price = price * 1.03;`
+
+   📅 Frecuencia: `EVERY 1 MONTH`
+
+   ------
+
+   ## 🔹 **4. Crear backups lógicos diariamente**
+
+   > **Historia:** Como auditor, deseo un evento que genere un backup lógico cada medianoche.
+
+   🧠 **Explicación:**
+    Este evento no ejecuta comandos del sistema, pero puede volcar datos clave a una tabla temporal o de respaldo (`products_backup`, `rates_backup`, etc.).
+
+   📅 `EVERY 1 DAY STARTS '00:00:00'`
+
+   ------
+
+   ## 🔹 **5. Notificar sobre productos favoritos sin calificar**
+
+   > **Historia:** Como cliente, quiero un evento que me recuerde los productos que tengo en favoritos y no he calificado.
+
+   🧠 **Explicación:**
+    Genera una lista (`user_reminders`) de `product_id` donde el cliente tiene el producto en favoritos pero no hay `rate`.
+
+   🛠️ Requiere `INSERT INTO recordatorios` usando un `LEFT JOIN` y `WHERE rate IS NULL`.
+
+   ------
+
+   ## 🔹 **6. Revisar inconsistencias entre empresa y productos**
+
+   > **Historia:** Como técnico, deseo un evento que revise inconsistencias entre empresas y productos cada domingo.
+
+   🧠 **Explicación:**
+    Detecta productos sin empresa, o empresas sin productos, y los registra en una tabla de anomalías.
+
+   🛠️ Puede usar `NOT EXISTS` y `JOIN` para llenar una tabla `errores_log`.
+
+   📅 `EVERY 1 WEEK ON SUNDAY`
+
+   ------
+
+   ## 🔹 **7. Archivar membresías vencidas diariamente**
+
+   > **Historia:** Como administrador, quiero un evento que archive membresías vencidas.
+
+   🧠 **Explicación:**
+    Cambia el estado de la membresía cuando su `end_date` ya pasó.
+
+   🛠️ `UPDATE membershipperiods SET status = 'INACTIVA' WHERE end_date < CURDATE();`
+
+   ------
+
+   ## 🔹 **8. Notificar beneficios nuevos a usuarios semanalmente**
+
+   > **Historia:** Como supervisor, deseo un evento que notifique por correo sobre beneficios nuevos.
+
+   🧠 **Explicación:**
+    Detecta registros nuevos en la tabla `benefits` desde la última semana y los inserta en `notificaciones`.
+
+   🛠️ `INSERT INTO notificaciones SELECT ... WHERE created_at >= NOW() - INTERVAL 7 DAY`
+
+   ------
+
+   ## 🔹 **9. Calcular cantidad de favoritos por cliente mensualmente**
+
+   > **Historia:** Como operador, quiero un evento que calcule el total de favoritos por cliente y lo guarde.
+
+   🧠 **Explicación:**
+    Cuenta los productos favoritos por cliente y guarda el resultado en una tabla de resumen mensual (`favoritos_resumen`).
+
+   🛠️ `INSERT INTO favoritos_resumen SELECT customer_id, COUNT(*) ... GROUP BY customer_id`
+
+   ------
+
+   ## 🔹 **10. Validar claves foráneas semanalmente**
+
+   > **Historia:** Como auditor, deseo un evento que valide claves foráneas semanalmente y reporte errores.
+
+   🧠 **Explicación:**
+    Comprueba que cada `product_id`, `customer_id`, etc., tengan correspondencia en sus tablas. Si no, se registra en una tabla `inconsistencias_fk`.
+
+   ------
+
+   ## 🔹 **11. Eliminar calificaciones inválidas antiguas**
+
+   > **Historia:** Como técnico, quiero un evento que elimine calificaciones con errores antiguos.
+
+   🧠 **Explicación:**
+    Borra `rates` donde el valor de `rating` es NULL o <0 y que hayan sido creadas hace más de 3 meses.
+
+   🛠️ `DELETE FROM rates WHERE rating IS NULL AND created_at < NOW() - INTERVAL 3 MONTH`
+
+   ------
+
+   ## 🔹 **12. Cambiar estado de encuestas inactivas automáticamente**
+
+   > **Historia:** Como desarrollador, deseo un evento que actualice encuestas que no se han usado en mucho tiempo.
+
+   🧠 **Explicación:**
+    Cambia el campo `status = 'inactiva'` si una encuesta no tiene nuevas respuestas en más de 6 meses.
+
+   ------
+
+   ## 🔹 **13. Registrar auditorías de forma periódica**
+
+   > **Historia:** Como administrador, quiero un evento que inserte datos de auditoría periódicamente.
+
+   🧠 **Explicación:**
+    Cada día, se puede registrar el conteo de productos, usuarios, etc. en una tabla tipo `auditorias_diarias`.
+
+   ------
+
+   ## 🔹 **14. Notificar métricas de calidad a empresas**
+
+   > **Historia:** Como gestor, deseo un evento que notifique a las empresas sus métricas de calidad cada lunes.
+
+   🧠 **Explicación:**
+    Genera una tabla o archivo con `AVG(rating)` por producto y empresa y se registra en `notificaciones_empresa`.
+
+   ------
+
+   ## 🔹 **15. Recordar renovación de membresías**
+
+   > **Historia:** Como cliente, quiero un evento que me recuerde renovar la membresía próxima a vencer.
+
+   🧠 **Explicación:**
+    Busca `membershipperiods` donde `end_date` esté entre hoy y 7 días adelante, e inserta recordatorios.
+
+   ------
+
+   ## 🔹 **16. Reordenar estadísticas generales cada semana**
+
+   > **Historia:** Como operador, deseo un evento que reordene estadísticas generales.
+
+   🧠 **Explicación:**
+    Calcula y actualiza métricas como total de productos activos, clientes registrados, etc., en una tabla `estadisticas`.
+
+   ------
+
+   ## 🔹 **17. Crear resúmenes temporales de uso por categoría**
+
+   > **Historia:** Como técnico, quiero un evento que cree resúmenes temporales por categoría.
+
+   🧠 **Explicación:**
+    Cuenta cuántos productos se han calificado en cada categoría y guarda los resultados para dashboards.
+
+   ------
+
+   ## 🔹 **18. Actualizar beneficios caducados**
+
+   > **Historia:** Como gerente, deseo un evento que desactive beneficios que ya expiraron.
+
+   🧠 **Explicación:**
+    Revisa si un beneficio tiene una fecha de expiración (campo `expires_at`) y lo marca como inactivo.
+
+   ------
+
+   ## 🔹 **19. Alertar productos sin evaluación anual**
+
+   > **Historia:** Como auditor, quiero un evento que genere alertas sobre productos sin evaluación anual.
+
+   🧠 **Explicación:**
+    Busca productos sin `rate` en los últimos 365 días y genera alertas o registros en `alertas_productos`.
+
+   ------
+
+   ## 🔹 **20. Actualizar precios con índice externo**
+
+   > **Historia:** Como administrador, deseo un evento que actualice precios según un índice referenciado.
+
+   🧠 **Explicación:**
+    Se podría tener una tabla `inflacion_indice` y aplicar ese valor multiplicador a los precios de productos activos.
+
+   
+
+## 🔹 **7. Historias de Usuario con JOINs**
+
+1. ## 🔹 **1. Ver productos con la empresa que los vende**
+
+   > **Historia:** Como analista, quiero consultar todas las empresas junto con los productos que ofrecen, mostrando el nombre del producto y el precio.
+
+   🧠 **Explicación para dummies:**
+    Imagina que tienes dos tablas: una con empresas (`companies`) y otra con productos (`products`). Hay una tabla intermedia llamada `companyproducts` que dice qué empresa vende qué producto y a qué precio.
+    Con un `JOIN`, unes estas tablas para ver “Empresa A vende Producto X a $10”.
+
+   🔍 Se usa un `INNER JOIN`.
+
+   ------
+
+   ## 🔹 **2. Mostrar productos favoritos con su empresa y categoría**
+
+   > **Historia:** Como cliente, deseo ver mis productos favoritos junto con la categoría y el nombre de la empresa que los ofrece.
+
+   🧠 **Explicación:**
+    Tú como cliente guardaste algunos productos en favoritos. Quieres ver no solo el nombre, sino también quién lo vende y a qué categoría pertenece.
+
+   🔍 Aquí se usan varios `JOIN` para traer todo en una sola consulta bonita y completa.
+
+   ------
+
+   ## 🔹 **3. Ver empresas aunque no tengan productos**
+
+   > **Historia:** Como supervisor, quiero ver todas las empresas aunque no tengan productos asociados.
+
+   🧠 **Explicación:**
+    No todas las empresas suben productos de inmediato. Queremos verlas igualmente.
+    Un `LEFT JOIN` te permite mostrar la empresa, aunque no tenga productos en la otra tabla.
+
+   🔍 Se une `companies LEFT JOIN`.
+
+   ------
+
+   ## 🔹 **4. Ver productos que fueron calificados (o no)**
+
+   > **Historia:** Como técnico, deseo obtener todas las calificaciones de productos incluyendo aquellos productos que aún no han sido calificados.
+
+   🧠 **Explicación:**
+    Queremos ver todos los productos. Si hay calificación, que la muestre; si no, que aparezca como NULL.
+    Esto se hace con un `RIGHT JOIN` desde `rates` hacia `products`.
+
+   🔍 Así sabrás qué productos no tienen aún calificaciones.
+
+   ------
+
+   ## 🔹 **5. Ver productos con promedio de calificación y empresa**
+
+   > **Historia:** Como gestor, quiero ver productos con su promedio de calificación y nombre de la empresa.
+
+   🧠 **Explicación:**
+    El producto vive en la tabla `products`, el precio y empresa están en `companyproducts`, y las calificaciones en `rates`.
+    Un `JOIN` permite unir todo y usar `AVG(rates.valor)` para calcular el promedio.
+
+   🔍 Combinas `products JOIN companyproducts JOIN companies JOIN rates`.
+
+   ------
+
+   ## 🔹 **6. Ver clientes y sus calificaciones (si las tienen)**
+
+   > **Historia:** Como operador, deseo obtener todos los clientes y sus calificaciones si existen.
+
+   🧠 **Explicación:**
+    A algunos clientes no les gusta calificar, pero igual deben aparecer.
+    Se hace un `LEFT JOIN` desde `customers` hacia `rates`.
+
+   🔍 Devuelve calificaciones o `NULL` si el cliente nunca calificó.
+
+   ------
+
+   ## 🔹 **7. Ver favoritos con la última calificación del cliente**
+
+   > **Historia:** Como cliente, quiero consultar todos mis favoritos junto con la última calificación que he dado.
+
+   🧠 **Explicación:**
+    Esto requiere unir tus productos favoritos (`favorites` + `details_favorites`) con las calificaciones (`rates`), filtradas por la fecha más reciente.
+
+   🔍 Requiere `JOIN` y subconsulta con `MAX(created_at)` o `ORDER BY` + `LIMIT 1`.
+
+   ------
+
+   ## 🔹 **8. Ver beneficios incluidos en cada plan de membresía**
+
+   > **Historia:** Como administrador, quiero unir `membershipbenefits`, `benefits` y `memberships`.
+
+   🧠 **Explicación:**
+    Tienes planes (`memberships`), beneficios (`benefits`) y una tabla que los relaciona (`membershipbenefits`).
+    Un `JOIN` muestra qué beneficios tiene cada plan.
+
+   ------
+
+   ## 🔹 **9. Ver clientes con membresía activa y sus beneficios**
+
+   > **Historia:** Como gerente, deseo ver todos los clientes con membresía activa y sus beneficios actuales.
+
+   🧠 **Explicación:** La intención es **mostrar una lista de clientes** que:
+
+   1. Tienen **una membresía activa** (vigente hoy).
+   2. Y a esa membresía le corresponden **uno o más beneficios**.
+
+   🔍 Mucho `JOIN`, pero muestra todo lo que un cliente recibe por su membresía.
+
+   ------
+
+   ## 🔹 **10. Ver ciudades con cantidad de empresas**
+
+   > **Historia:** Como operador, quiero obtener todas las ciudades junto con la cantidad de empresas registradas.
+
+   🧠 **Explicación:**
+    Unes `citiesormunicipalities` con `companies` y cuentas cuántas empresas hay por ciudad (`COUNT(*) GROUP BY ciudad`).
+
+   ------
+
+   ## 🔹 **11. Ver encuestas con calificaciones**
+
+   > **Historia:** Como analista, deseo unir `polls` y `rates`.
+
+   🧠 **Explicación:**
+    Cada encuesta (`polls`) puede estar relacionada con una calificación (`rates`).
+    El `JOIN` permite ver qué encuesta usó el cliente para calificar.
+
+   ------
+
+   ## 🔹 **12. Ver productos evaluados con datos del cliente**
+
+   > **Historia:** Como técnico, quiero consultar todos los productos evaluados con su fecha y cliente.
+
+   🧠 **Explicación:**
+    Unes `rates`, `products` y `customers` para saber qué cliente evaluó qué producto y cuándo.
+
+   ------
+
+   ## 🔹 **13. Ver productos con audiencia de la empresa**
+
+   > **Historia:** Como supervisor, deseo obtener todos los productos con la audiencia objetivo de la empresa.
+
+   🧠 **Explicación:**
+    Unes `products`, `companyproducts`, `companies` y `audiences` para saber si ese producto está dirigido a niños, adultos, etc.
+
+   ------
+
+   ## 🔹 **14. Ver clientes con sus productos favoritos**
+
+   > **Historia:** Como auditor, quiero unir `customers` y `favorites`.
+
+   🧠 **Explicación:**
+    Para ver qué productos ha marcado como favorito cada cliente.
+    Unes `customers` → `favorites` → `details_favorites` → `products`.
+
+   ------
+
+   ## 🔹 **15. Ver planes, periodos, precios y beneficios**
+
+   > **Historia:** Como gestor, deseo obtener la relación de planes de membresía, periodos, precios y beneficios.
+
+   🧠 **Explicación:**
+    Unes `memberships`, `membershipperiods`, `membershipbenefits`, y `benefits`.
+
+   🔍 Sirve para hacer un catálogo completo de lo que incluye cada plan.
+
+   ------
+
+   ## 🔹 **16. Ver combinaciones empresa-producto-cliente calificados**
+
+   > **Historia:** Como desarrollador, quiero consultar todas las combinaciones empresa-producto-cliente que hayan sido calificadas.
+
+   🧠 **Explicación:**
+    Une `rates` con `products`, `companyproducts`, `companies`, y `customers`.
+
+   🔍 Así sabes: quién calificó, qué producto, de qué empresa.
+
+   ------
+
+   ## 🔹 **17. Comparar favoritos con productos calificados**
+
+   > **Historia:** Como cliente, quiero ver productos que he calificado y también tengo en favoritos.
+
+   🧠 **Explicación:**
+    Une `details_favorites` y `rates` por `product_id`, filtrando por tu `customer_id`.
+
+   ------
+
+   ## 🔹 **18. Ver productos ordenados por categoría**
+
+   > **Historia:** Como operador, quiero unir `categories` y `products`.
+
+   🧠 **Explicación:**
+    Cada producto tiene una categoría.
+    El `JOIN` permite ver el nombre de la categoría junto al nombre del producto.
+
+   ------
+
+   ## 🔹 **19. Ver beneficios por audiencia, incluso vacíos**
+
+   > **Historia:** Como especialista, quiero listar beneficios por audiencia, incluso si no tienen asignados.
+
+   🧠 **Explicación:**
+    Un `LEFT JOIN` desde `audiences` hacia `audiencebenefits` y luego `benefits`.
+
+   🔍 Audiencias sin beneficios mostrarán `NULL`.
+
+   ------
+
+   ## 🔹 **20. Ver datos cruzados entre calificaciones, encuestas, productos y clientes**
+
+   > **Historia:** Como auditor, deseo una consulta que relacione `rates`, `polls`, `products` y `customers`.
+
+   🧠 **Explicación:**
+    Es una auditoría cruzada. Se une todo lo relacionado con una calificación:
+
+   - ¿Quién calificó? (`customers`)
+   - ¿Qué calificó? (`products`)
+   - ¿En qué encuesta? (`polls`)
+   - ¿Qué valor dio? (`rates`)
+
+## 🔹 **8. Historias de Usuario con Funciones Definidas por el Usuario (UDF)**
+
+1. Como analista, quiero una función que calcule el **promedio ponderado de calidad** de un producto basado en sus calificaciones y fecha de evaluación.
+
+   > **Explicación:** Se desea una función `calcular_promedio_ponderado(product_id)` que combine el valor de `rate` y la antigüedad de cada calificación para dar más peso a calificaciones recientes.
+
+2. Como auditor, deseo una función que determine si un producto ha sido **calificado recientemente** (últimos 30 días).
+
+   > **Explicación:** Se busca una función booleana `es_calificacion_reciente(fecha)` que devuelva `TRUE` si la calificación se hizo en los últimos 30 días.
+
+3. Como desarrollador, quiero una función que reciba un `product_id` y devuelva el **nombre completo de la empresa** que lo vende.
+
+   > **Explicación:** La función `obtener_empresa_producto(product_id)` haría un `JOIN` entre `companyproducts` y `companies` y devolvería el nombre de la empresa.
+
+4. Como operador, deseo una función que, dado un `customer_id`, me indique si el cliente tiene una **membresía activa**.
+
+   > **Explicación:** `tiene_membresia_activa(customer_id)` consultaría la tabla `membershipperiods` para ese cliente y verificaría si la fecha actual está dentro del rango.
+
+5. Como administrador, quiero una función que valide si una ciudad tiene **más de X empresas registradas**, recibiendo la ciudad y el número como 
+
+   parámetros.
+
+   > **Explicación:** `ciudad_supera_empresas(city_id, limite)` devolvería `TRUE` si el conteo de empresas en esa ciudad excede `limite`.
+
+6. Como gerente, deseo una función que, dado un `rate_id`, me devuelva una **descripción textual de la calificación** (por ejemplo, “Muy bueno”, “Regular”).
+
+   > **Explicación:** `descripcion_calificacion(valor)` devolvería “Excelente” si `valor = 5`, “Bueno” si `valor = 4`, etc.
+
+7. Como técnico, quiero una función que devuelva el **estado de un producto** en función de su evaluación (ej. “Aceptable”, “Crítico”).
+
+   > **Explicación:** `estado_producto(product_id)` clasificaría un producto como “Crítico”, “Aceptable” o “Óptimo” según su promedio de calificaciones.
+
+8. Como cliente, deseo una función que indique si un producto está **entre mis favoritos**, recibiendo el `product_id` y mi `customer_id`.
+
+   > **Explicación:** `es_favorito(customer_id, product_id)` devolvería `TRUE` si hay un registro en `details_favorites`.
+
+9. Como gestor de beneficios, quiero una función que determine si un beneficio está **asignado a una audiencia específica**, retornando verdadero o falso.
+
+   > **Explicación:** `beneficio_asignado_audiencia(benefit_id, audience_id)` buscaría en `audiencebenefits` y retornaría `TRUE` si hay coincidencia.
+
+10. Como auditor, deseo una función que reciba una fecha y determine si se encuentra dentro de un **rango de membresía activa**.
+
+    > **Explicación:** `fecha_en_membresia(fecha, customer_id)` compararía `fecha` con los rangos de `membershipperiods` activos del cliente.
+
+11. Como desarrollador, quiero una función que calcule el **porcentaje de calificaciones positivas** de un producto respecto al total.
+
+    > **Explicación:** `porcentaje_positivas(product_id)` devolvería la relación entre calificaciones mayores o iguales a 4 y el total de calificaciones.
+
+12. Como supervisor, deseo una función que calcule la **edad de una calificación**, en días, desde la fecha actual.
+
+    > Un **supervisor** quiere saber cuántos **días han pasado** desde que se registró una calificación de un producto. Este cálculo debe hacerse dinámicamente comparando la **fecha actual del sistema (`CURRENT_DATE`)** con la **fecha en que se hizo la calificación** (que suponemos está almacenada en un campo como `created_at` o `rate_date` en la tabla `rates`).
+
+13. Como operador, quiero una función que, dado un `company_id`, devuelva la **cantidad de productos únicos** asociados a esa empresa.
+
+    > **Explicación:** `productos_por_empresa(company_id)` haría un `COUNT(DISTINCT product_id)` en `companyproducts`.
+
+14. Como gerente, deseo una función que retorne el **nivel de actividad** de un cliente (frecuente, esporádico, inactivo), según su número de calificaciones.
+
+15. Como administrador, quiero una función que calcule el **precio promedio ponderado** de un producto, tomando en cuenta su uso en favoritos.
+
+16. Como técnico, deseo una función que me indique si un `benefit_id` está asignado a más de una audiencia o membresía (valor booleano).
+
+17. Como cliente, quiero una función que, dada mi ciudad, retorne un **índice de variedad** basado en número de empresas y productos.
+
+18. Como gestor de calidad, deseo una función que evalúe si un producto debe ser **desactivado** por tener baja calificación histórica.
+
+## 19. Como desarrollador, quiero una función que calcule el **índice de popularidad** de un producto (combinando favoritos y ratings).
+
+## 20. Como auditor, deseo una función que genere un código único basado en el nombre del producto y su fecha de creación.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
