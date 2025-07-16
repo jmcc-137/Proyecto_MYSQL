@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS companies(
     city_id VARCHAR(6),
     audience_id INT,
     cellphone VARCHAR(15),
-    email VARCHAR(80)
+    email VARCHAR(80),
+
 )ENGINE = INNODB;
 
 
@@ -179,6 +180,9 @@ CREATE TABLE IF NOT EXISTS quality_products(
     rating DOUBLE,
     PRIMARY KEY(product_id, customer_id, poll_id,company_id)
 )ENGINE = INNODB;
+
+ALTER TABLE companies
+ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE stateorregions
 ADD CONSTRAINT fk_stateorregions_country FOREIGN KEY (country_id) REFERENCES countries(isocode),

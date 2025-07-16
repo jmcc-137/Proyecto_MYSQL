@@ -93,6 +93,8 @@ https://i.ibb.co/JwMnYkcr/DERPlat-Products.png
 
 # Historias de Usuario
 
+# Historias de Usuario
+
 ## 🔹 **1. Consultas SQL Especializadas**
 
 1. Como analista, quiero listar todos los productos con su empresa asociada y el precio más bajo por ciudad.
@@ -1209,6 +1211,11 @@ https://i.ibb.co/JwMnYkcr/DERPlat-Products.png
 
 20. Como auditor, deseo una función que genere un código único basado en el nombre del producto y su fecha de creación.
 
+# Requerimientos de entrega
+
+1. Instrucciones DDL con la creación de la estructura completa de la base de datos.
+2. Instrucciones Insert para cada una de las tablas.
+3. Documentos de codificacion geografica : https://drive.google.com/drive/folders/1zvAgacAzQUo2zyHho6C7eHhmQkc3SHmO?usp=sharing
 # Requerimientos de entrega
 
 1. Instrucciones DDL con la creación de la estructura completa de la base de datos.
