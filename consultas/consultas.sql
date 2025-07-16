@@ -1020,13 +1020,13 @@ DELIMITER ;
 
 CALL sp_insertar_empresa_con_productos(
     'COMP021', 
-    4, 
+    4,
     'Nueva Empresa SA', 
-    3, 
+    3,  
     'BOG001', 
-    6, 
+    6,  
     '6012345678', 
-    'contacto@nuevaempresa.com'
+    'contacto@nuevaempresa.com' 
 );
 ```
    ------
@@ -1044,11 +1044,13 @@ DELIMITER //
 CREATE PROCEDURE sp_agregar_favorito(
     IN p_customer_id INT,
     IN p_product_id INT,
-    IN p_company_id VARCHAR(20))
+    IN p_company_id VARCHAR(20)
+)
 BEGIN
     DECLARE v_favorite_id INT;
     DECLARE v_exists INT DEFAULT 0;
     
+    -- Verificar si el producto ya es favorito para este cliente
     SELECT COUNT(*) INTO v_exists
     FROM favorites f
     JOIN details_favorites df ON f.id = df.favorite_id
@@ -1056,6 +1058,7 @@ BEGIN
     AND df.product_id = p_product_id;
     
     IF v_exists = 0 THEN
+
         SELECT id INTO v_favorite_id FROM favorites 
         WHERE customer_id = p_customer_id AND company_id = p_company_id;
         
@@ -1064,9 +1067,14 @@ BEGIN
             VALUES (p_customer_id, p_company_id);
             SET v_favorite_id = LAST_INSERT_ID();
         END IF;
-    
+        
+       \
         INSERT INTO details_favorites (favorite_id, product_id)
         VALUES (v_favorite_id, p_product_id);
+        
+        SELECT 'Producto añadido a favoritos' AS message;
+    ELSE
+        SELECT 'El producto ya está en tus favoritos' AS message;
     END IF;
 END //
 DELIMITER ;

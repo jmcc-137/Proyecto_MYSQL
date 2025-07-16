@@ -98,7 +98,7 @@ https://i.ibb.co/JwMnYkcr/DERPlat-Products.png
 
 ## 1. Como analista, quiero listar todos los productos con su empresa asociada y el precio más bajo por ciudad.
 
-### RESPUSTA
+### RESPUESTA
 ```sql
 SELECT ci.name AS ciudad, p.name AS producto, co.name AS empresa, MIN(cp.price) AS precio_mas_bajo
 FROM citiesormunicipalities AS ci

@@ -1,6 +1,6 @@
-# CREACION DE LA BASE DE DATOS
 
-```sql
+
+
 CREATE DATABASE proyecto_MYSQL;
 
 USE proyecto_MYSQL;
@@ -138,13 +138,16 @@ address VARCHAR(120)
 CREATE TABLE IF NOT EXISTS favorites(
 id INT AUTO_INCREMENT PRIMARY KEY,
 customer_id INT,
-company_id VARCHAR(20)
+company_id VARCHAR(20),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+UNIQUE key(customer_id,company_id)
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS details_favorites(
 id INT PRIMARY KEY,
 favorite_id INT,
-product_id INT
+product_id INT,
+UNIQUE KEY (favorite_id, product_id)
 )ENGINE = INNODB;
 
 
@@ -180,6 +183,11 @@ CREATE TABLE IF NOT EXISTS quality_products(
     rating DOUBLE,
     PRIMARY KEY(product_id, customer_id, poll_id,company_id)
 )ENGINE = INNODB;
+
+
+
+ALTER TABLE products
+ADD COLUMN average_rating DECIMAL(3,2) DEFAULT NULL COMMENT 'Promedio de calificaciones del producto';
 
 ALTER TABLE companies
 ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
@@ -265,4 +273,3 @@ ADD CONSTRAINT fk_rates_company FOREIGN KEY (company_id) REFERENCES companies(id
 
 ALTER TABLE rates
 ADD CONSTRAINT fk_rates_poll FOREIGN KEY (poll_id) REFERENCES polls(id);
-```
