@@ -2772,7 +2772,18 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    c.name AS empresa,
+    p.name AS producto,
+    cp.price AS precio
+FROM 
+    companyproducts cp
+INNER JOIN 
+    companies c ON cp.company_id = c.id
+INNER JOIN 
+    products p ON cp.product_id = p.id
+ORDER BY 
+    c.name, p.name;
 
    ```
 
@@ -2788,7 +2799,27 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    cu.name AS cliente,
+    p.name AS producto_favorito,
+    cat.description AS categoria,
+    co.name AS empresa
+FROM 
+    customers cu
+INNER JOIN 
+    favorites f ON cu.id = f.customer_id
+INNER JOIN 
+    details_favorites df ON f.id = df.favorite_id
+INNER JOIN 
+    products p ON df.product_id = p.id
+INNER JOIN 
+    companyproducts cp ON p.id = cp.product_id
+INNER JOIN 
+    companies co ON cp.company_id = co.id
+INNER JOIN 
+    categories cat ON p.category_id = cat.id
+WHERE 
+    cu.id = [ID_DEL_CLIENTE];
    
    ```
    ## 🔹 **3. Ver empresas aunque no tengan productos**
@@ -2804,7 +2835,18 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    c.name AS empresa,
+    p.name AS producto,
+    IFNULL(cp.price, 'Sin productos') AS precio
+FROM 
+    companies c
+LEFT JOIN 
+    companyproducts cp ON c.id = cp.company_id
+LEFT JOIN 
+    products p ON cp.product_id = p.id
+ORDER BY 
+    c.name;
    
    ```
    ## 🔹 **4. Ver productos que fueron calificados (o no)**
@@ -2820,7 +2862,16 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    p.name AS producto,
+    r.rating AS calificacion,
+    r.daterating AS fecha_calificacion
+FROM 
+    quality_products r
+RIGHT JOIN 
+    products p ON r.product_id = p.id
+ORDER BY 
+    p.name;
    
    ```
    ## 🔹 **5. Ver productos con promedio de calificación y empresa**
@@ -2836,7 +2887,22 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    p.name AS producto,
+    c.name AS empresa,
+    AVG(qp.rating) AS promedio_calificacion
+FROM 
+    products p
+INNER JOIN 
+    companyproducts cp ON p.id = cp.product_id
+INNER JOIN 
+    companies c ON cp.company_id = c.id
+LEFT JOIN 
+    quality_products qp ON p.id = qp.product_id
+GROUP BY 
+    p.id, c.id
+ORDER BY 
+    promedio_calificacion DESC;
    
    ```
    ## 🔹 **6. Ver clientes y sus calificaciones (si las tienen)**
@@ -2852,7 +2918,19 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    c.name AS cliente,
+    r.rating AS calificacion,
+    r.daterating AS fecha_calificacion,
+    co.name AS empresa_calificada
+FROM 
+    customers c
+LEFT JOIN 
+    rates r ON c.id = r.customer_id
+LEFT JOIN 
+    companies co ON r.company_id = co.id
+ORDER BY 
+    c.name;
    
    ```
    ## 🔹 **7. Ver favoritos con la última calificación del cliente**
@@ -2867,7 +2945,26 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    c.name AS cliente,
+    p.name AS producto_favorito,
+    (
+        SELECT rating 
+        FROM quality_products q 
+        WHERE q.product_id = p.id AND q.customer_id = c.id
+        ORDER BY daterating DESC 
+        LIMIT 1
+    ) AS ultima_calificacion
+FROM 
+    customers c
+INNER JOIN 
+    favorites f ON c.id = f.customer_id
+INNER JOIN 
+    details_favorites df ON f.id = df.favorite_id
+INNER JOIN 
+    products p ON df.product_id = p.id
+WHERE 
+    c.id = [ID_DEL_CLIENTE];
    
    ```
    ## 🔹 **8. Ver beneficios incluidos en cada plan de membresía**
@@ -2881,7 +2978,18 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    m.name AS membresia,
+    b.description AS beneficio,
+    b.detail AS detalle_beneficio
+FROM 
+    memberships m
+INNER JOIN 
+    membershipbenefits mb ON m.id = mb.membership_id
+INNER JOIN 
+    benefits b ON mb.benefit_id = b.id
+ORDER BY 
+    m.name, b.description;
    
    ```
    ## 🔹 **9. Ver clientes con membresía activa y sus beneficios**
@@ -2898,7 +3006,24 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    c.name AS cliente,
+    m.name AS membresia,
+    b.description AS beneficio
+FROM 
+    customers c
+INNER JOIN 
+    recordatorios_membresias rm ON c.id = rm.customer_id
+INNER JOIN 
+    memberships m ON rm.membership_id = m.id
+INNER JOIN 
+    membershipbenefits mb ON m.id = mb.membership_id
+INNER JOIN 
+    benefits b ON mb.benefit_id = b.id
+WHERE 
+    rm.fecha >= CURDATE() - INTERVAL 30 DAY
+ORDER BY 
+    c.name;
    
    ```
    ## 🔹 **10. Ver ciudades con cantidad de empresas**
@@ -2911,7 +3036,17 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    cm.name AS ciudad,
+    COUNT(c.id) AS cantidad_empresas
+FROM 
+    citiesormunicipalities cm
+LEFT JOIN 
+    companies c ON cm.code = c.city_id
+GROUP BY 
+    cm.code
+ORDER BY 
+    cantidad_empresas DESC;
    
    ```
    ## 🔹 **11. Ver encuestas con calificaciones**
@@ -2925,7 +3060,16 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    p.name AS encuesta,
+    r.rating AS calificacion,
+    r.daterating AS fecha_calificacion
+FROM 
+    polls p
+LEFT JOIN 
+    rates r ON p.id = r.poll_id
+ORDER BY 
+    p.name;
    
    ```
    ## 🔹 **12. Ver productos evaluados con datos del cliente**
@@ -2938,7 +3082,19 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    p.name AS producto,
+    c.name AS cliente,
+    qp.rating AS calificacion,
+    qp.daterating AS fecha_calificacion
+FROM 
+    quality_products qp
+INNER JOIN 
+    products p ON qp.product_id = p.id
+INNER JOIN 
+    customers c ON qp.customer_id = c.id
+ORDER BY 
+    qp.daterating DESC;
    
    ```
    ## 🔹 **13. Ver productos con audiencia de la empresa**
@@ -2951,7 +3107,20 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    p.name AS producto,
+    c.name AS empresa,
+    a.description AS audiencia_objetivo
+FROM 
+    products p
+INNER JOIN 
+    companyproducts cp ON p.id = cp.product_id
+INNER JOIN 
+    companies c ON cp.company_id = c.id
+INNER JOIN 
+    audiences a ON c.audience_id = a.id
+ORDER BY 
+    a.description, p.name;
    
    ```
    ## 🔹 **14. Ver clientes con sus productos favoritos**
@@ -2965,7 +3134,22 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    c.name AS cliente,
+    p.name AS producto_favorito,
+    cat.description AS categoria
+FROM 
+    customers c
+INNER JOIN 
+    favorites f ON c.id = f.customer_id
+INNER JOIN 
+    details_favorites df ON f.id = df.favorite_id
+INNER JOIN 
+    products p ON df.product_id = p.id
+INNER JOIN 
+    categories cat ON p.category_id = cat.id
+ORDER BY 
+    c.name, p.name;
    
    ```
    ## 🔹 **15. Ver planes, periodos, precios y beneficios**
@@ -2980,7 +3164,25 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    m.name AS plan_membresia,
+    pe.name AS periodo,
+    mp.price AS precio,
+    GROUP_CONCAT(b.description SEPARATOR ', ') AS beneficios
+FROM 
+    memberships m
+INNER JOIN 
+    membershipperiods mp ON m.id = mp.membership_id
+INNER JOIN 
+    periods pe ON mp.period_id = pe.id
+LEFT JOIN 
+    membershipbenefits mb ON m.id = mb.membership_id AND pe.id = mb.period_id
+LEFT JOIN 
+    benefits b ON mb.benefit_id = b.id
+GROUP BY 
+    m.id, pe.id, mp.price
+ORDER BY 
+    m.name, pe.name;
    
    ```
    ## 🔹 **16. Ver combinaciones empresa-producto-cliente calificados**
@@ -2995,7 +3197,22 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    co.name AS empresa,
+    p.name AS producto,
+    cu.name AS cliente,
+    qp.rating AS calificacion,
+    qp.daterating AS fecha_calificacion
+FROM 
+    quality_products qp
+INNER JOIN 
+    products p ON qp.product_id = p.id
+INNER JOIN 
+    companies co ON qp.company_id = co.id
+INNER JOIN 
+    customers cu ON qp.customer_id = cu.id
+ORDER BY 
+    qp.daterating DESC;
    
    ```
    ## 🔹 **17. Comparar favoritos con productos calificados**
@@ -3008,7 +3225,24 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    c.name AS cliente,
+    p.name AS producto,
+    'Favorito y calificado' AS estado
+FROM 
+    customers c
+INNER JOIN 
+    favorites f ON c.id = f.customer_id
+INNER JOIN 
+    details_favorites df ON f.id = df.favorite_id
+INNER JOIN 
+    products p ON df.product_id = p.id
+WHERE 
+    EXISTS (
+        SELECT 1 FROM quality_products qp 
+        WHERE qp.product_id = p.id AND qp.customer_id = c.id
+    )
+AND c.id = [ID_DEL_CLIENTE];
    
    ```
    ## 🔹 **18. Ver productos ordenados por categoría**
@@ -3023,7 +3257,16 @@ DO CALL sp_actualizar_precios_indice_externo();
    ## RESPUESTA
    ```sql
 
-   
+   SELECT 
+    cat.description AS categoria,
+    p.name AS producto,
+    p.price AS precio
+FROM 
+    products p
+INNER JOIN 
+    categories cat ON p.category_id = cat.id
+ORDER BY 
+    cat.description, p.name;
    ```
    ## 🔹 **19. Ver beneficios por audiencia, incluso vacíos**
 
@@ -3037,7 +3280,19 @@ DO CALL sp_actualizar_precios_indice_externo();
    ------
    ## RESPUESTA
    ```sql
-
+SELECT 
+    a.description AS audiencia,
+    IFNULL(GROUP_CONCAT(b.description SEPARATOR ', '), 'Sin beneficios') AS beneficios
+FROM 
+    audiences a
+LEFT JOIN 
+    audiencebenefits ab ON a.id = ab.audience_id
+LEFT JOIN 
+    benefits b ON ab.benefit_id = b.id
+GROUP BY 
+    a.id
+ORDER BY 
+    a.description;
    
    ```
    ## 🔹 **20. Ver datos cruzados entre calificaciones, encuestas, productos y clientes**
@@ -3053,7 +3308,22 @@ DO CALL sp_actualizar_precios_indice_externo();
    - ¿Qué valor dio? (`rates`)
    ## RESPUESTA
    ```sql
-
+SELECT 
+    c.name AS cliente,
+    p.name AS producto,
+    po.name AS encuesta,
+    qp.rating AS calificacion,
+    qp.daterating AS fecha_calificacion
+FROM 
+    quality_products qp
+INNER JOIN 
+    customers c ON qp.customer_id = c.id
+INNER JOIN 
+    products p ON qp.product_id = p.id
+INNER JOIN 
+    polls po ON qp.poll_id = po.id
+ORDER BY 
+    qp.daterating DESC;
    
    ```
 ## 🔹 **8. Historias de Usuario con Funciones Definidas por el Usuario (UDF)**
@@ -3063,7 +3333,39 @@ DO CALL sp_actualizar_precios_indice_externo();
    > **Explicación:** Se desea una función `calcular_promedio_ponderado(product_id)` que combine el valor de `rate` y la antigüedad de cada calificación para dar más peso a calificaciones recientes.
    ## RESPUESTA
    ```sql
-
+DELIMITER //
+CREATE FUNCTION calcular_promedio_ponderado(product_id INT) 
+RETURNS DECIMAL(3,2)
+DETERMINISTIC
+BEGIN
+    DECLARE total_weight DECIMAL(10,2);
+    DECLARE weighted_sum DECIMAL(10,2);
+    DECLARE days_old INT;
+    DECLARE weight DECIMAL(10,2);
+    DECLARE avg_rating DECIMAL(3,2);
+    
+    SELECT 
+        SUM(DATEDIFF(CURDATE(), DATE(daterating)) INTO total_weight
+    FROM 
+        quality_products
+    WHERE 
+        product_id = product_id;
+    
+    IF total_weight = 0 THEN
+        SELECT AVG(rating) INTO avg_rating FROM quality_products WHERE product_id = product_id;
+        RETURN avg_rating;
+    END IF;
+    
+    SELECT 
+        SUM(rating * (DATEDIFF(CURDATE(), DATE(daterating)) / total_weight)) INTO weighted_sum
+    FROM 
+        quality_products
+    WHERE 
+        product_id = product_id;
+    
+    RETURN weighted_sum;
+END //
+DELIMITER ;
    
    ```
 2. Como auditor, deseo una función que determine si un producto ha sido **calificado recientemente** (últimos 30 días).
@@ -3071,7 +3373,24 @@ DO CALL sp_actualizar_precios_indice_externo();
    > **Explicación:** Se busca una función booleana `es_calificacion_reciente(fecha)` que devuelva `TRUE` si la calificación se hizo en los últimos 30 días.
    ## RESPUESTA
    ```sql
-
+DELIMITER //
+CREATE FUNCTION es_calificacion_reciente(product_id INT) 
+RETURNS BOOLEAN
+DETERMINISTIC
+BEGIN
+    DECLARE last_rating_date DATE;
+    
+    SELECT MAX(DATE(daterating)) INTO last_rating_date
+    FROM quality_products
+    WHERE product_id = product_id;
+    
+    IF last_rating_date IS NULL THEN
+        RETURN FALSE;
+    ELSE
+        RETURN DATEDIFF(CURDATE(), last_rating_date) <= 30;
+    END IF;
+END //
+DELIMITER ;
    
    ```
 3. Como desarrollador, quiero una función que reciba un `product_id` y devuelva el **nombre completo de la empresa** que lo vende.
