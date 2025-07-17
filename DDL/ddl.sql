@@ -11,7 +11,6 @@ CREATE TABLE IF NOT EXISTS countries(
     name VARCHAR(50),
     alfaisotwo VARCHAR(2),
     alfaisothree VARCHAR(4)
-
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS subdivisioncategories(
@@ -64,8 +63,7 @@ CREATE TABLE IF NOT EXISTS companies(
     city_id VARCHAR(6),
     audience_id INT,
     cellphone VARCHAR(15),
-    email VARCHAR(80),
-
+    email VARCHAR(80)
 )ENGINE = INNODB;
 
 
@@ -273,3 +271,117 @@ ADD CONSTRAINT fk_rates_company FOREIGN KEY (company_id) REFERENCES companies(id
 
 ALTER TABLE rates
 ADD CONSTRAINT fk_rates_poll FOREIGN KEY (poll_id) REFERENCES polls(id);
+
+
+CREATE TABLE products_backup LIKE products;
+ALTER TABLE products_backup ADD COLUMN backup_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TABLE quality_products_backup LIKE quality_products;
+ALTER TABLE quality_products_backup ADD COLUMN backup_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
+CREATE TABLE user_reminders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    product_id INT,
+    reminder_date TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+CREATE TABLE errores_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_error VARCHAR(50),
+    descripcion TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE notificaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    mensaje TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    leido BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+CREATE TABLE favoritos_resumen (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    total_favoritos INT,
+    mes INT,
+    anio INT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+CREATE TABLE inconsistencias_fk (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tabla VARCHAR(50),
+    id_registro INT,
+    error TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE auditorias_diarias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE,
+    total_productos INT,
+    total_clientes INT,
+    total_empresas INT,
+    total_calificaciones INT
+);
+
+CREATE TABLE notificaciones_empresa (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id VARCHAR(20),
+    mensaje TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id)
+);
+
+CREATE TABLE recordatorios_membresias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    membership_id INT,
+    mensaje TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id),
+    FOREIGN KEY (membership_id) REFERENCES memberships(id)
+);
+
+CREATE TABLE estadisticas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    total_productos INT,
+    total_clientes INT,
+    total_empresas INT,
+    total_calificaciones INT,
+    promedio_calificaciones DECIMAL(3,2),
+    fecha_actualizacion TIMESTAMP
+);
+
+CREATE TABLE resumen_categorias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    categoria_id INT,
+    total_productos INT,
+    promedio_calificacion DECIMAL(3,2),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (categoria_id) REFERENCES categories(id)
+);
+
+
+CREATE TABLE alertas_productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    mensaje TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+CREATE TABLE inflacion_indice (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    valor DECIMAL(5,2),
+    fecha DATE,
+    descripcion VARCHAR(100)
+);

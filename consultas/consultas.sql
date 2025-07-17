@@ -29,11 +29,22 @@ ORDER BY cantidad_productos_calificados DESC, promedio DESC LIMIT 5;
 
 ### RESPUESTA
  ```sql
- SELECT p.category_id, cp.unimeasure_id, COUNT(*) AS total_productos
- FROM products AS p
- JOIN categori
- JOIN companyproducts AS cp ON p.id = cp.product_id
- GROUP BY p.category_id, cp.unimeasure_id; 
+SELECT 
+    c.description AS categoria,
+    um.description AS unidad_medida,
+    COUNT(DISTINCT p.id) AS cantidad_productos
+FROM 
+    products p
+JOIN 
+    categories c ON p.category_id = c.id
+JOIN 
+    companyproducts cp ON p.id = cp.product_id
+JOIN 
+    unitofmeasure um ON cp.unimeasure_id = um.id
+GROUP BY 
+    c.description, um.description
+ORDER BY 
+    cantidad_productos DESC;
  ```
 ## 4. Como cliente, quiero saber qué productos tienen calificaciones superiores al promedio general.
 
@@ -2146,7 +2157,24 @@ DELIMITER ;
    🛠️ **Se usaría un `DELETE`** sobre `products` donde no existan registros en `rates`, `favorites` ni `companyproducts`.
 
    📅 **Frecuencia del evento:** `EVERY 6 MONTH`
+   ## RESPUESTA
+   ```sql
 
+   DELIMITER //
+CREATE PROCEDURE sp_borrar_productos_inactivos()
+BEGIN
+    DELETE FROM products 
+    WHERE id NOT IN (SELECT DISTINCT product_id FROM companyproducts)
+    AND id NOT IN (SELECT DISTINCT product_id FROM quality_products)
+    AND id NOT IN (SELECT DISTINCT df.product_id FROM details_favorites df JOIN favorites f ON df.favorite_id = f.id)
+    AND created_at < DATE_SUB(NOW(), INTERVAL 6 MONTH);
+END //
+DELIMITER ;
+
+CREATE EVENT ev_borrar_productos_inactivos
+ON SCHEDULE EVERY 6 MONTH
+DO CALL sp_borrar_productos_inactivos();
+   ```
    ------
 
    ## 🔹 **2. Recalcular el promedio de calificaciones semanalmente**
@@ -2161,7 +2189,26 @@ DELIMITER ;
    📅 Frecuencia: `EVERY 1 WEEK`
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   DELIMITER //
+CREATE PROCEDURE sp_actualizar_promedios()
+BEGIN
+    UPDATE products p
+    JOIN (
+        SELECT product_id, AVG(rating) as avg_rating
+        FROM quality_products
+        GROUP BY product_id
+    ) qp ON p.id = qp.product_id
+    SET p.average_rating = qp.avg_rating;
+END //
+DELIMITER ;
+
+CREATE EVENT ev_actualizar_promedios
+ON SCHEDULE EVERY 1 WEEK
+DO CALL sp_actualizar_promedios();
+   ```
    ## 🔹 **3. Actualizar precios según inflación mensual**
 
    > **Historia:** Como operador, quiero un evento mensual que actualice los precios de productos por inflación.
@@ -2174,7 +2221,24 @@ DELIMITER ;
    📅 Frecuencia: `EVERY 1 MONTH`
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_precios_inflacion()
+BEGIN
+    DECLARE porcentaje_inflacion DECIMAL(5,2);
+    SET porcentaje_inflacion = 1.03; -- 3% de inflación
+    
+    UPDATE companyproducts
+    SET price = ROUND(price * porcentaje_inflacion, 2);
+END //
+DELIMITER ;
 
+CREATE EVENT ev_actualizar_precios_inflacion
+ON SCHEDULE EVERY 1 MONTH
+DO CALL sp_actualizar_precios_inflacion();
+   
+   ```
    ## 🔹 **4. Crear backups lógicos diariamente**
 
    > **Historia:** Como auditor, deseo un evento que genere un backup lógico cada medianoche.
@@ -2185,7 +2249,26 @@ DELIMITER ;
    📅 `EVERY 1 DAY STARTS '00:00:00'`
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_generar_backup_diario()
+BEGIN
+    -- Crear backup de productos
+    INSERT INTO products_backup
+    SELECT * FROM products WHERE updated_at >= DATE_SUB(NOW(), INTERVAL 1 DAY);
+    
+    -- Crear backup de calificaciones
+    INSERT INTO quality_products_backup
+    SELECT * FROM quality_products WHERE daterating >= DATE_SUB(NOW(), INTERVAL 1 DAY);
+END //
+DELIMITER ;
 
+CREATE EVENT ev_generar_backup_diario
+ON SCHEDULE EVERY 1 DAY STARTS '00:00:00'
+DO CALL sp_generar_backup_diario();
+   
+   ```
    ## 🔹 **5. Notificar sobre productos favoritos sin calificar**
 
    > **Historia:** Como cliente, quiero un evento que me recuerde los productos que tengo en favoritos y no he calificado.
@@ -2196,7 +2279,25 @@ DELIMITER ;
    🛠️ Requiere `INSERT INTO recordatorios` usando un `LEFT JOIN` y `WHERE rate IS NULL`.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_recordar_calificar_favoritos()
+BEGIN
+    INSERT INTO user_reminders (customer_id, product_id, reminder_date)
+    SELECT f.customer_id, df.product_id, NOW()
+    FROM favorites f
+    JOIN details_favorites df ON f.id = df.favorite_id
+    LEFT JOIN quality_products qp ON df.product_id = qp.product_id AND f.customer_id = qp.customer_id
+    WHERE qp.id IS NULL;
+END //
+DELIMITER ;
 
+CREATE EVENT ev_recordar_calificar_favoritos
+ON SCHEDULE EVERY 1 WEEK
+DO CALL sp_recordar_calificar_favoritos();
+   
+   ```
    ## 🔹 **6. Revisar inconsistencias entre empresa y productos**
 
    > **Historia:** Como técnico, deseo un evento que revise inconsistencias entre empresas y productos cada domingo.
@@ -2209,7 +2310,36 @@ DELIMITER ;
    📅 `EVERY 1 WEEK ON SUNDAY`
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_revisar_inconsistencias_empresas()
+BEGIN
+    -- Empresas sin productos
+    INSERT INTO errores_log (tipo_error, descripcion, fecha)
+    SELECT 'EMPRESA_SIN_PRODUCTOS', 
+           CONCAT('La empresa ', c.name, ' no tiene productos asociados'), 
+           NOW()
+    FROM companies c
+    LEFT JOIN companyproducts cp ON c.id = cp.company_id
+    WHERE cp.id IS NULL;
+    
+    -- Productos sin empresa
+    INSERT INTO errores_log (tipo_error, descripcion, fecha)
+    SELECT 'PRODUCTO_SIN_EMPRESA', 
+           CONCAT('El producto ', p.name, ' no está asociado a ninguna empresa'), 
+           NOW()
+    FROM products p
+    LEFT JOIN companyproducts cp ON p.id = cp.product_id
+    WHERE cp.id IS NULL;
+END //
+DELIMITER ;
 
+CREATE EVENT ev_revisar_inconsistencias_empresas
+ON SCHEDULE EVERY 1 WEEK ON SUNDAY
+DO CALL sp_revisar_inconsistencias_empresas();
+   
+   ```
    ## 🔹 **7. Archivar membresías vencidas diariamente**
 
    > **Historia:** Como administrador, quiero un evento que archive membresías vencidas.
@@ -2220,7 +2350,22 @@ DELIMITER ;
    🛠️ `UPDATE membershipperiods SET status = 'INACTIVA' WHERE end_date < CURDATE();`
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_archivar_membresias_vencidas()
+BEGIN
+    UPDATE membershipperiods
+    SET status = 'INACTIVA'
+    WHERE end_date < CURDATE() AND status = 'ACTIVA';
+END //
+DELIMITER ;
 
+CREATE EVENT ev_archivar_membresias_vencidas
+ON SCHEDULE EVERY 1 DAY
+DO CALL sp_archivar_membresias_vencidas();
+   
+   ```
    ## 🔹 **8. Notificar beneficios nuevos a usuarios semanalmente**
 
    > **Historia:** Como supervisor, deseo un evento que notifique por correo sobre beneficios nuevos.
@@ -2231,7 +2376,28 @@ DELIMITER ;
    🛠️ `INSERT INTO notificaciones SELECT ... WHERE created_at >= NOW() - INTERVAL 7 DAY`
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_notificar_beneficios_nuevos()
+BEGIN
+    INSERT INTO notificaciones (customer_id, mensaje, fecha)
+    SELECT m.customer_id, 
+           CONCAT('Nuevo beneficio disponible: ', b.description),
+           NOW()
+    FROM membershipbenefits mb
+    JOIN benefits b ON mb.benefit_id = b.id
+    JOIN membershipperiods mp ON mb.membership_id = mp.membership_id
+    JOIN memberships m ON mb.membership_id = m.id
+    WHERE b.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY);
+END //
+DELIMITER ;
 
+CREATE EVENT ev_notificar_beneficios_nuevos
+ON SCHEDULE EVERY 1 WEEK
+DO CALL sp_notificar_beneficios_nuevos();
+   
+   ```
    ## 🔹 **9. Calcular cantidad de favoritos por cliente mensualmente**
 
    > **Historia:** Como operador, quiero un evento que calcule el total de favoritos por cliente y lo guarde.
@@ -2242,7 +2408,24 @@ DELIMITER ;
    🛠️ `INSERT INTO favoritos_resumen SELECT customer_id, COUNT(*) ... GROUP BY customer_id`
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_calcular_favoritos_mensuales()
+BEGIN
+    INSERT INTO favoritos_resumen (customer_id, total_favoritos, mes, anio)
+    SELECT f.customer_id, COUNT(DISTINCT df.product_id), MONTH(NOW()), YEAR(NOW())
+    FROM favorites f
+    JOIN details_favorites df ON f.id = df.favorite_id
+    GROUP BY f.customer_id;
+END //
+DELIMITER ;
 
+CREATE EVENT ev_calcular_favoritos_mensuales
+ON SCHEDULE EVERY 1 MONTH
+DO CALL sp_calcular_favoritos_mensuales();
+   
+   ```
    ## 🔹 **10. Validar claves foráneas semanalmente**
 
    > **Historia:** Como auditor, deseo un evento que valide claves foráneas semanalmente y reporte errores.
@@ -2251,7 +2434,39 @@ DELIMITER ;
     Comprueba que cada `product_id`, `customer_id`, etc., tengan correspondencia en sus tablas. Si no, se registra en una tabla `inconsistencias_fk`.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_validar_claves_foraneas()
+BEGIN
+    -- Validar productos en companyproducts
+    INSERT INTO inconsistencias_fk (tabla, id_registro, error, fecha)
+    SELECT 'companyproducts', cp.id, 'Producto no existe', NOW()
+    FROM companyproducts cp
+    LEFT JOIN products p ON cp.product_id = p.id
+    WHERE p.id IS NULL;
+    
+    -- Validar empresas en companyproducts
+    INSERT INTO inconsistencias_fk (tabla, id_registro, error, fecha)
+    SELECT 'companyproducts', cp.id, 'Empresa no existe', NOW()
+    FROM companyproducts cp
+    LEFT JOIN companies c ON cp.company_id = c.id
+    WHERE c.id IS NULL;
+    
+    -- Validar clientes en quality_products
+    INSERT INTO inconsistencias_fk (tabla, id_registro, error, fecha)
+    SELECT 'quality_products', qp.id, 'Cliente no existe', NOW()
+    FROM quality_products qp
+    LEFT JOIN customers c ON qp.customer_id = c.id
+    WHERE c.id IS NULL;
+END //
+DELIMITER ;
 
+CREATE EVENT ev_validar_claves_foraneas
+ON SCHEDULE EVERY 1 WEEK
+DO CALL sp_validar_claves_foraneas();
+   
+   ```
    ## 🔹 **11. Eliminar calificaciones inválidas antiguas**
 
    > **Historia:** Como técnico, quiero un evento que elimine calificaciones con errores antiguos.
@@ -2262,7 +2477,22 @@ DELIMITER ;
    🛠️ `DELETE FROM rates WHERE rating IS NULL AND created_at < NOW() - INTERVAL 3 MONTH`
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_eliminar_calificaciones_invalidas()
+BEGIN
+    DELETE FROM quality_products
+    WHERE (rating IS NULL OR rating < 0)
+    AND daterating < DATE_SUB(NOW(), INTERVAL 3 MONTH);
+END //
+DELIMITER ;
 
+CREATE EVENT ev_eliminar_calificaciones_invalidas
+ON SCHEDULE EVERY 1 MONTH
+DO CALL sp_eliminar_calificaciones_invalidas();
+   
+   ```
    ## 🔹 **12. Cambiar estado de encuestas inactivas automáticamente**
 
    > **Historia:** Como desarrollador, deseo un evento que actualice encuestas que no se han usado en mucho tiempo.
@@ -2271,7 +2501,28 @@ DELIMITER ;
     Cambia el campo `status = 'inactiva'` si una encuesta no tiene nuevas respuestas en más de 6 meses.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_estado_encuestas()
+BEGIN
+    UPDATE polls p
+    LEFT JOIN (
+        SELECT poll_id, MAX(daterating) as ultima_respuesta
+        FROM quality_products
+        GROUP BY poll_id
+    ) qp ON p.id = qp.poll_id
+    SET p.isactive = FALSE
+    WHERE p.isactive = TRUE
+    AND (qp.ultima_respuesta < DATE_SUB(NOW(), INTERVAL 6 MONTH) OR qp.ultima_respuesta IS NULL);
+END //
+DELIMITER ;
 
+CREATE EVENT ev_actualizar_estado_encuestas
+ON SCHEDULE EVERY 1 MONTH
+DO CALL sp_actualizar_estado_encuestas();
+   
+   ```
    ## 🔹 **13. Registrar auditorías de forma periódica**
 
    > **Historia:** Como administrador, quiero un evento que inserte datos de auditoría periódicamente.
@@ -2280,7 +2531,26 @@ DELIMITER ;
     Cada día, se puede registrar el conteo de productos, usuarios, etc. en una tabla tipo `auditorias_diarias`.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_registrar_auditorias_diarias()
+BEGIN
+    INSERT INTO auditorias_diarias (fecha, total_productos, total_clientes, total_empresas, total_calificaciones)
+    SELECT 
+        CURDATE(),
+        (SELECT COUNT(*) FROM products),
+        (SELECT COUNT(*) FROM customers),
+        (SELECT COUNT(*) FROM companies),
+        (SELECT COUNT(*) FROM quality_products);
+END //
+DELIMITER ;
 
+CREATE EVENT ev_registrar_auditorias_diarias
+ON SCHEDULE EVERY 1 DAY
+DO CALL sp_registrar_auditorias_diarias();
+   
+   ```
    ## 🔹 **14. Notificar métricas de calidad a empresas**
 
    > **Historia:** Como gestor, deseo un evento que notifique a las empresas sus métricas de calidad cada lunes.
@@ -2289,7 +2559,27 @@ DELIMITER ;
     Genera una tabla o archivo con `AVG(rating)` por producto y empresa y se registra en `notificaciones_empresa`.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_notificar_metricas_calidad()
+BEGIN
+    INSERT INTO notificaciones_empresa (company_id, mensaje, fecha)
+    SELECT 
+        c.id,
+        CONCAT('Métricas de calidad - Promedio: ', ROUND(AVG(qp.rating), 2), ', Total calificaciones: ', COUNT(qp.id)),
+        NOW()
+    FROM companies c
+    JOIN quality_products qp ON c.id = qp.company_id
+    GROUP BY c.id;
+END //
+DELIMITER ;
 
+CREATE EVENT ev_notificar_metricas_calidad
+ON SCHEDULE EVERY 1 WEEK ON MONDAY
+DO CALL sp_notificar_metricas_calidad();
+   
+   ```
    ## 🔹 **15. Recordar renovación de membresías**
 
    > **Historia:** Como cliente, quiero un evento que me recuerde renovar la membresía próxima a vencer.
@@ -2298,7 +2588,28 @@ DELIMITER ;
     Busca `membershipperiods` donde `end_date` esté entre hoy y 7 días adelante, e inserta recordatorios.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_recordar_renovacion_membresias()
+BEGIN
+    INSERT INTO recordatorios_membresias (customer_id, membership_id, mensaje, fecha)
+    SELECT 
+        mp.customer_id,
+        mp.membership_id,
+        CONCAT('Tu membresía vence el ', mp.end_date, '. ¡Renueva ahora!'),
+        NOW()
+    FROM membershipperiods mp
+    WHERE mp.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+    AND mp.status = 'ACTIVA';
+END //
+DELIMITER ;
 
+CREATE EVENT ev_recordar_renovacion_membresias
+ON SCHEDULE EVERY 1 DAY
+DO CALL sp_recordar_renovacion_membresias();
+   
+   ```
    ## 🔹 **16. Reordenar estadísticas generales cada semana**
 
    > **Historia:** Como operador, deseo un evento que reordene estadísticas generales.
@@ -2307,7 +2618,27 @@ DELIMITER ;
     Calcula y actualiza métricas como total de productos activos, clientes registrados, etc., en una tabla `estadisticas`.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_estadisticas_generales()
+BEGIN
+    UPDATE estadisticas
+    SET 
+        total_productos = (SELECT COUNT(*) FROM products),
+        total_clientes = (SELECT COUNT(*) FROM customers),
+        total_empresas = (SELECT COUNT(*) FROM companies),
+        total_calificaciones = (SELECT COUNT(*) FROM quality_products),
+        promedio_calificaciones = (SELECT AVG(rating) FROM quality_products),
+        fecha_actualizacion = NOW();
+END //
+DELIMITER ;
 
+CREATE EVENT ev_actualizar_estadisticas_generales
+ON SCHEDULE EVERY 1 WEEK
+DO CALL sp_actualizar_estadisticas_generales();
+   
+   ```
    ## 🔹 **17. Crear resúmenes temporales de uso por categoría**
 
    > **Historia:** Como técnico, quiero un evento que cree resúmenes temporales por categoría.
@@ -2316,7 +2647,29 @@ DELIMITER ;
     Cuenta cuántos productos se han calificado en cada categoría y guarda los resultados para dashboards.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_crear_resumen_categorias()
+BEGIN
+    INSERT INTO resumen_categorias (categoria_id, total_productos, promedio_calificacion, fecha)
+    SELECT 
+        c.id,
+        COUNT(DISTINCT p.id),
+        ROUND(AVG(qp.rating), 2),
+        NOW()
+    FROM categories c
+    LEFT JOIN products p ON c.id = p.category_id
+    LEFT JOIN quality_products qp ON p.id = qp.product_id
+    GROUP BY c.id;
+END //
+DELIMITER ;
 
+CREATE EVENT ev_crear_resumen_categorias
+ON SCHEDULE EVERY 1 MONTH
+DO CALL sp_crear_resumen_categorias();
+   
+   ```
    ## 🔹 **18. Actualizar beneficios caducados**
 
    > **Historia:** Como gerente, deseo un evento que desactive beneficios que ya expiraron.
@@ -2325,7 +2678,22 @@ DELIMITER ;
     Revisa si un beneficio tiene una fecha de expiración (campo `expires_at`) y lo marca como inactivo.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_beneficios_caducados()
+BEGIN
+    UPDATE benefits
+    SET is_active = FALSE
+    WHERE expires_at < NOW() AND is_active = TRUE;
+END //
+DELIMITER ;
 
+CREATE EVENT ev_actualizar_beneficios_caducados
+ON SCHEDULE EVERY 1 DAY
+DO CALL sp_actualizar_beneficios_caducados();
+   
+   ```
    ## 🔹 **19. Alertar productos sin evaluación anual**
 
    > **Historia:** Como auditor, quiero un evento que genere alertas sobre productos sin evaluación anual.
@@ -2334,14 +2702,59 @@ DELIMITER ;
     Busca productos sin `rate` en los últimos 365 días y genera alertas o registros en `alertas_productos`.
 
    ------
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_alertar_productos_sin_evaluacion()
+BEGIN
+    INSERT INTO alertas_productos (product_id, mensaje, fecha)
+    SELECT 
+        p.id,
+        'Este producto no ha sido evaluado en los últimos 12 meses',
+        NOW()
+    FROM products p
+    LEFT JOIN (
+        SELECT product_id, MAX(daterating) as ultima_calificacion
+        FROM quality_products
+        GROUP BY product_id
+    ) qp ON p.id = qp.product_id
+    WHERE qp.ultima_calificacion < DATE_SUB(NOW(), INTERVAL 1 YEAR) 
+    OR qp.ultima_calificacion IS NULL;
+END //
+DELIMITER ;
 
+CREATE EVENT ev_alertar_productos_sin_evaluacion
+ON SCHEDULE EVERY 1 MONTH
+DO CALL sp_alertar_productos_sin_evaluacion();
+   
+   ```
    ## 🔹 **20. Actualizar precios con índice externo**
 
    > **Historia:** Como administrador, deseo un evento que actualice precios según un índice referenciado.
 
    🧠 **Explicación:**
     Se podría tener una tabla `inflacion_indice` y aplicar ese valor multiplicador a los precios de productos activos.
+   ## RESPUESTA
+   ```sql
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_precios_indice_externo()
+BEGIN
+    DECLARE indice DECIMAL(5,2);
+    
+    -- Obtener el último índice de inflación
+    SELECT valor INTO indice FROM inflacion_indice ORDER BY fecha DESC LIMIT 1;
+    
+    -- Actualizar precios
+    UPDATE companyproducts
+    SET price = ROUND(price * (1 + indice/100), 2);
+END //
+DELIMITER ;
 
+CREATE EVENT ev_actualizar_precios_indice_externo
+ON SCHEDULE EVERY 1 MONTH
+DO CALL sp_actualizar_precios_indice_externo();
+   
+   ```
    
 
 ## 🔹 **7. Historias de Usuario con JOINs**
@@ -2357,6 +2770,11 @@ DELIMITER ;
    🔍 Se usa un `INNER JOIN`.
 
    ------
+   ## RESPUESTA
+   ```sql
+
+
+   ```
 
    ## 🔹 **2. Mostrar productos favoritos con su empresa y categoría**
 
@@ -2368,7 +2786,11 @@ DELIMITER ;
    🔍 Aquí se usan varios `JOIN` para traer todo en una sola consulta bonita y completa.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **3. Ver empresas aunque no tengan productos**
 
    > **Historia:** Como supervisor, quiero ver todas las empresas aunque no tengan productos asociados.
@@ -2380,7 +2802,11 @@ DELIMITER ;
    🔍 Se une `companies LEFT JOIN`.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **4. Ver productos que fueron calificados (o no)**
 
    > **Historia:** Como técnico, deseo obtener todas las calificaciones de productos incluyendo aquellos productos que aún no han sido calificados.
@@ -2392,7 +2818,11 @@ DELIMITER ;
    🔍 Así sabrás qué productos no tienen aún calificaciones.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **5. Ver productos con promedio de calificación y empresa**
 
    > **Historia:** Como gestor, quiero ver productos con su promedio de calificación y nombre de la empresa.
@@ -2404,7 +2834,11 @@ DELIMITER ;
    🔍 Combinas `products JOIN companyproducts JOIN companies JOIN rates`.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **6. Ver clientes y sus calificaciones (si las tienen)**
 
    > **Historia:** Como operador, deseo obtener todos los clientes y sus calificaciones si existen.
@@ -2416,7 +2850,11 @@ DELIMITER ;
    🔍 Devuelve calificaciones o `NULL` si el cliente nunca calificó.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **7. Ver favoritos con la última calificación del cliente**
 
    > **Historia:** Como cliente, quiero consultar todos mis favoritos junto con la última calificación que he dado.
@@ -2427,7 +2865,11 @@ DELIMITER ;
    🔍 Requiere `JOIN` y subconsulta con `MAX(created_at)` o `ORDER BY` + `LIMIT 1`.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **8. Ver beneficios incluidos en cada plan de membresía**
 
    > **Historia:** Como administrador, quiero unir `membershipbenefits`, `benefits` y `memberships`.
@@ -2437,7 +2879,11 @@ DELIMITER ;
     Un `JOIN` muestra qué beneficios tiene cada plan.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **9. Ver clientes con membresía activa y sus beneficios**
 
    > **Historia:** Como gerente, deseo ver todos los clientes con membresía activa y sus beneficios actuales.
@@ -2450,7 +2896,11 @@ DELIMITER ;
    🔍 Mucho `JOIN`, pero muestra todo lo que un cliente recibe por su membresía.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **10. Ver ciudades con cantidad de empresas**
 
    > **Historia:** Como operador, quiero obtener todas las ciudades junto con la cantidad de empresas registradas.
@@ -2459,7 +2909,11 @@ DELIMITER ;
     Unes `citiesormunicipalities` con `companies` y cuentas cuántas empresas hay por ciudad (`COUNT(*) GROUP BY ciudad`).
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **11. Ver encuestas con calificaciones**
 
    > **Historia:** Como analista, deseo unir `polls` y `rates`.
@@ -2469,7 +2923,11 @@ DELIMITER ;
     El `JOIN` permite ver qué encuesta usó el cliente para calificar.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **12. Ver productos evaluados con datos del cliente**
 
    > **Historia:** Como técnico, quiero consultar todos los productos evaluados con su fecha y cliente.
@@ -2478,7 +2936,11 @@ DELIMITER ;
     Unes `rates`, `products` y `customers` para saber qué cliente evaluó qué producto y cuándo.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **13. Ver productos con audiencia de la empresa**
 
    > **Historia:** Como supervisor, deseo obtener todos los productos con la audiencia objetivo de la empresa.
@@ -2487,7 +2949,11 @@ DELIMITER ;
     Unes `products`, `companyproducts`, `companies` y `audiences` para saber si ese producto está dirigido a niños, adultos, etc.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **14. Ver clientes con sus productos favoritos**
 
    > **Historia:** Como auditor, quiero unir `customers` y `favorites`.
@@ -2497,7 +2963,11 @@ DELIMITER ;
     Unes `customers` → `favorites` → `details_favorites` → `products`.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **15. Ver planes, periodos, precios y beneficios**
 
    > **Historia:** Como gestor, deseo obtener la relación de planes de membresía, periodos, precios y beneficios.
@@ -2508,7 +2978,11 @@ DELIMITER ;
    🔍 Sirve para hacer un catálogo completo de lo que incluye cada plan.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **16. Ver combinaciones empresa-producto-cliente calificados**
 
    > **Historia:** Como desarrollador, quiero consultar todas las combinaciones empresa-producto-cliente que hayan sido calificadas.
@@ -2519,7 +2993,11 @@ DELIMITER ;
    🔍 Así sabes: quién calificó, qué producto, de qué empresa.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **17. Comparar favoritos con productos calificados**
 
    > **Historia:** Como cliente, quiero ver productos que he calificado y también tengo en favoritos.
@@ -2528,7 +3006,11 @@ DELIMITER ;
     Une `details_favorites` y `rates` por `product_id`, filtrando por tu `customer_id`.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **18. Ver productos ordenados por categoría**
 
    > **Historia:** Como operador, quiero unir `categories` y `products`.
@@ -2538,7 +3020,11 @@ DELIMITER ;
     El `JOIN` permite ver el nombre de la categoría junto al nombre del producto.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **19. Ver beneficios por audiencia, incluso vacíos**
 
    > **Historia:** Como especialista, quiero listar beneficios por audiencia, incluso si no tienen asignados.
@@ -2549,7 +3035,11 @@ DELIMITER ;
    🔍 Audiencias sin beneficios mostrarán `NULL`.
 
    ------
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    ## 🔹 **20. Ver datos cruzados entre calificaciones, encuestas, productos y clientes**
 
    > **Historia:** Como auditor, deseo una consulta que relacione `rates`, `polls`, `products` y `customers`.
@@ -2561,19 +3051,35 @@ DELIMITER ;
    - ¿Qué calificó? (`products`)
    - ¿En qué encuesta? (`polls`)
    - ¿Qué valor dio? (`rates`)
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
 ## 🔹 **8. Historias de Usuario con Funciones Definidas por el Usuario (UDF)**
 
 1. Como analista, quiero una función que calcule el **promedio ponderado de calidad** de un producto basado en sus calificaciones y fecha de evaluación.
 
    > **Explicación:** Se desea una función `calcular_promedio_ponderado(product_id)` que combine el valor de `rate` y la antigüedad de cada calificación para dar más peso a calificaciones recientes.
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
 2. Como auditor, deseo una función que determine si un producto ha sido **calificado recientemente** (últimos 30 días).
 
    > **Explicación:** Se busca una función booleana `es_calificacion_reciente(fecha)` que devuelva `TRUE` si la calificación se hizo en los últimos 30 días.
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
 3. Como desarrollador, quiero una función que reciba un `product_id` y devuelva el **nombre completo de la empresa** que lo vende.
+   ## RESPUESTA
+   ```sql
 
+   
+   ```
    > **Explicación:** La función `obtener_empresa_producto(product_id)` haría un `JOIN` entre `companyproducts` y `companies` y devolvería el nombre de la empresa.
 
 4. Como operador, deseo una función que, dado un `customer_id`, me indique si el cliente tiene una **membresía activa**.
