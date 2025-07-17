@@ -3403,7 +3403,7 @@ ORDER BY
    - ¿En qué encuesta? (`polls`)
    - ¿Qué valor dio? (`rates`)
    ## RESPUESTA
-   ```sql
+```sql
 SELECT 
     c.name AS cliente,
     p.name AS producto,
@@ -3427,48 +3427,49 @@ ORDER BY
 1. Como analista, quiero una función que calcule el **promedio ponderado de calidad** de un producto basado en sus calificaciones y fecha de evaluación.
 
    > **Explicación:** Se desea una función `calcular_promedio_ponderado(product_id)` que combine el valor de `rate` y la antigüedad de cada calificación para dar más peso a calificaciones recientes.
-   ## RESPUESTA
-   ```sql
-DELIMITER //
-CREATE FUNCTION calcular_promedio_ponderado(product_id INT) 
-RETURNS DECIMAL(3,2)
-DETERMINISTIC
-BEGIN
-    DECLARE total_weight DECIMAL(10,2);
-    DECLARE weighted_sum DECIMAL(10,2);
-    DECLARE days_old INT;
-    DECLARE weight DECIMAL(10,2);
-    DECLARE avg_rating DECIMAL(3,2);
-    
-    SELECT 
-        SUM(DATEDIFF(CURDATE(), DATE(daterating))) INTO total_weight
-    FROM 
-        quality_products
-    WHERE 
-        product_id = product_id;
-    
-    IF total_weight = 0 THEN
-        SELECT AVG(rating) INTO avg_rating FROM quality_products WHERE product_id = product_id;
-        RETURN avg_rating;
-    END IF;
-    
-    SELECT 
-        SUM(rating * (DATEDIFF(CURDATE(), DATE(daterating)) / total_weight)) INTO weighted_sum
-    FROM 
-        quality_products
-    WHERE 
-        product_id = product_id;
-    
-    RETURN weighted_sum;
-END //
-DELIMITER ;
+
+## RESPUESTA
+```sql
+        DELIMITER //
+        CREATE FUNCTION calcular_promedio_ponderado(product_id INT) 
+        RETURNS DECIMAL(3,2)
+        DETERMINISTIC
+        BEGIN
+            DECLARE total_weight DECIMAL(10,2);
+            DECLARE weighted_sum DECIMAL(10,2);
+            DECLARE days_old INT;
+            DECLARE weight DECIMAL(10,2);
+            DECLARE avg_rating DECIMAL(3,2);
+            
+            SELECT 
+                SUM(DATEDIFF(CURDATE(), DATE(daterating))) INTO total_weight
+            FROM 
+                quality_products
+            WHERE 
+                product_id = product_id;
+            
+            IF total_weight = 0 THEN
+                SELECT AVG(rating) INTO avg_rating FROM quality_products WHERE product_id = product_id;
+                RETURN avg_rating;
+            END IF;
+            
+            SELECT 
+                SUM(rating * (DATEDIFF(CURDATE(), DATE(daterating)) / total_weight)) INTO weighted_sum
+            FROM 
+                quality_products
+            WHERE 
+                product_id = product_id;
+            
+            RETURN weighted_sum;
+        END //
+        DELIMITER ;
    
-   ```
+```
 2. Como auditor, deseo una función que determine si un producto ha sido **calificado recientemente** (últimos 30 días).
 
    > **Explicación:** Se busca una función booleana `es_calificacion_reciente(fecha)` que devuelva `TRUE` si la calificación se hizo en los últimos 30 días.
    ## RESPUESTA
-   ```sql
+```sql
 DELIMITER //
 CREATE FUNCTION es_calificacion_reciente(product_id INT) 
 RETURNS BOOLEAN
@@ -3488,7 +3489,7 @@ BEGIN
 END //
 DELIMITER ;
    
-   ```
+```
 3. Como desarrollador, quiero una función que reciba un `product_id` y devuelva el **nombre completo de la empresa** que lo vende.
    ## RESPUESTA
    ```sql
